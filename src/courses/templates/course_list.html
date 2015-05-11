@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{% with 'Courses' as subtitle  %}
+{{ block.super }}
+{% endwith %}{% endblock %}
+
+{% block navbar-left %}
+{% include "_navbar.html" with active_link="Courses" %}
+{% endblock %}
+
+{% block splash %}
+{% endblock splash %}
+
+{% block container %}
+<div class="container">
+<div class="page-header">
+  <h1>Courses</h1>
+</div>
+    <div class="list-group">
+        {% for course in object_list %}
+        <a href="#" class="list-group-item active">
+            <h4 class="list-group-item-heading">{{ course.Name }}</h4>
+            <p class="list-group-item-text">{{ course.Description }}</p>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock container %}

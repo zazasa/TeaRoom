@@ -3,7 +3,9 @@
 {% load staticfiles %}
 {% load crispy_forms_tags %}
 
-{% block title %}{{ block.super }}Home{% endblock %}
+{% block title %}{% with 'Home' as subtitle  %}
+{{ block.super }}
+{% endwith %}{% endblock %}
 
 {% block navbar-left %}
 {% include "_navbar.html" with active_link="home" %}

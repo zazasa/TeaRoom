@@ -55,6 +55,10 @@ class SignupForm(forms.ModelForm):
     """
     A form for creating new users.
     """
+    error_messages = {
+        'duplicate_username': _("A user with that %(username)s already exists."),
+    }
+
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
