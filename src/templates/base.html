@@ -11,14 +11,16 @@
   <meta name="author" content="Arun Ravindran">
   <link rel="shortcut icon" href="{% static 'site/img/logo.png' %}" type="image/png">
 
-  <title>{% block title %}{% include "_brandname.html" %} 
-  {% if subtitle %}
-    :: {{subtitle}}
-  {% endif %}
-  {% endblock %}</title>
+  <title>
+  {% block title %}{% include "_brandname.html" %}
+    {% if subtitle %}:: {{subtitle}}
+    {% endif %}
+  {% endblock %}
+  </title>
 
   <!-- Bootstrap core CSS -->
   <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" rel="stylesheet">
 
   <!-- Custom styles for this site -->
   {% block styles %}
@@ -39,6 +41,7 @@
 
       {% block navbar %}
       <div class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="sr-only">Toggle navigation</span>
@@ -81,6 +84,7 @@
       </ul>
     </div><!--/.nav-collapse -->
     {% endblock %}
+    </div>
   </div>
   {% endblock navbar %}
 
