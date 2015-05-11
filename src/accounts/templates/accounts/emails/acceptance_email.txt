@@ -1,0 +1,13 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}Your registration of {{ site_name }} was accepted by out staff.{% endblocktrans %}
+
+{% trans 'Please click the following url and set your account password to finish activation.' %}
+{% block reset_link %}
+{{ protocol }}://{{ domain }}{% url 'accounts:first-password-set-confirm' uidb64=uid token=token %}
+{% endblock %}
+
+{% trans "Thanks for using our site!" %}
+
+{% blocktrans %}The {{ site_name }} team{% endblocktrans %}
+
+{% endautoescape %}

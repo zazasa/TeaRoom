@@ -1,0 +1,16 @@
+{% extends "accounts/auth_base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}{{ block.super }}Registration was complete{% endblock %}
+
+{% block form_heading %}Registration was complete{% endblock %}
+
+{% block form %}
+<div class="form-message">
+    <p>Your registration was created successfully.</p>
+    <p>Please wait until the inspector verify your registration.</p>
+    <p>You will receive an acceptance or rejection email within several days.</p>
+</div>
+{% endblock form %}
+
