@@ -39,7 +39,7 @@ class NewUserAdmin(NamedUserAdmin):
     def accept_registration(self, request, queryset):
         rows_updated = queryset.update(status='accepted')
         for user in queryset:
-            self.set_password(user, request)
+            self.set_first_password(user, request)
         # import pdb; pdb.set_trace()
         if rows_updated == 1:
             message_bit = "1 user was"
@@ -47,7 +47,7 @@ class NewUserAdmin(NamedUserAdmin):
             message_bit = "%s users were" % rows_updated
         self.message_user(request, "%s successfully marked as accepted." % message_bit)
 
-    def set_password(self, user, request):
+    def set_first_password(self, user, request):
         subject_template_name = 'accounts/emails/acceptance_email_subject.txt'
         email_template_name = 'accounts/emails/acceptance_email.txt'
         # from_email = None

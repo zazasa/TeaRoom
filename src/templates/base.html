@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="{% block description %}{% endblock description %}">
-  <meta name="author" content="Arun Ravindran">
+  <meta name="author" content="">
   <link rel="shortcut icon" href="{% static 'site/img/logo.png' %}" type="image/png">
 
   <title>
@@ -88,30 +88,37 @@
   </div>
   {% endblock navbar %}
 
-  {% block messages %}
-  {% if messages %}
-  {% for message in messages %}
-  <div class="alert alert-{{ message.tags }}">  <!-- singular -->
-    <a class="close" data-dismiss="alert">×</a>
-    {{ message|safe }}
-  </div>
-  {% endfor %}
-  {% endif %}
-  {% endblock %}
 
   {% block splash %}
   {% endblock splash %}
 
-  {% block container %}
+
   <div class="container">
+    {% block messages %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">  <!-- singular -->
+          <a class="close" data-dismiss="alert">×</a>
+          {{ message|safe }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endblock %}
+
+  {% block container %}
+
+
+
 
     <div class="starter-template">
       <h1>New Project</h1>
       <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
     </div>
 
-  </div><!-- /.container -->
+
   {% endblock container %}
+  </div><!-- /.container -->
+
 
   <!-- Site footer -->
   {% block footer %}

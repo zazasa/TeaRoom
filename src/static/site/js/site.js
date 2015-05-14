@@ -10,9 +10,7 @@
       $('.navbar').addClass('navbar-transparent');
   }).trigger('scroll');
 
-
-
-  // bootstrap course-list template
+  // bootstrap course-list template 
   $('[id^=detail-]').hide();
   $('.toggle').click(function() {
     $input = $( this );

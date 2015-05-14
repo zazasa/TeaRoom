@@ -31,6 +31,11 @@ except:
 
 Site = {'name': SITE_NAME, 'domain': HOSTNAME}
 
+from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS as TCP
+
+TEMPLATE_CONTEXT_PROCESSORS = TCP + (
+    'django.core.context_processors.request',
+)
 
 # Use 12factor inspired environment variables or from a file
 import environ
@@ -128,7 +133,7 @@ MESSAGE_TAGS = {
 
 # Authentication Settings
 AUTH_USER_MODEL = 'accounts.User'
-LOGIN_REDIRECT_URL = reverse_lazy("profiles:show_self")
+LOGIN_REDIRECT_URL = reverse_lazy("home")
 LOGIN_URL = reverse_lazy("accounts:login")
 
 THUMBNAIL_EXTENSION = 'png'     # Or any extn for your thumbnails

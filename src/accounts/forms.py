@@ -59,7 +59,6 @@ class SignupForm(forms.ModelForm):
         'duplicate_username': _("A user with that %(username)s already exists."),
     }
 
-
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super(SignupForm, self).__init__(*args, **kwargs)

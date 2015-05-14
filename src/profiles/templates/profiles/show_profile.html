@@ -3,6 +3,10 @@
 {% load staticfiles %}
 {% load thumbnail %}
 
+{% block navbar-left %}
+{% include "_navbar.html" with active_link="home" %}
+{% endblock %}
+
 {% block title %}{{ block.super }}Profile{% endblock %}
 
 {% block container %}

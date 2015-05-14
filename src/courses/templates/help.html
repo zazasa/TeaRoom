@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load add_get_parameter %} 
+
+{% block title %}{% with 'Help' as subtitle  %}
+{{ block.super }}
+{% endwith %}{% endblock %}
+
+{% block navbar-left %}
+{% include "_navbar.html" with active_link="Help" %}
+{% endblock %}
+
+{% block splash %}
+<div class="container" style="height:80%">
+  <div class="jumbotron jumbotron-carousel corporate-jumbo">
+    <div class="row" style="top:50%;position:relative;text-align:center">
+        <h1>Sorry. You are alone.</h1>
+    </div>
+  </div>
+</div>
+{% endblock splash %}
+
+{% block container %}
+{% endblock container %}
+
+{% block scripts %}
+<script src="{% static 'site/js/site.js' %}"></script>
+{% endblock scripts %}
