@@ -32,17 +32,23 @@ class Course(models.Model):
 
     def __str__(self):
         return "%s %s" % (self.Name, str(self.Year))
-        
+
     def clean(self, *args, **kwargs):
         # add custom validation here
         if (self.Start_date > self.End_date):
             raise ValidationError('Start date cannot be greather than End_date')
         if (self.Enrollment_due_date > self.End_date):
             raise ValidationError('Enrollement due date cannot be greather than End_date')
+        # call default cleaning
         super(Course, self).clean(*args, **kwargs)
 
-    def save(self, *args, **kwargs):        
+    def save(self, *args, **kwargs):
+        """
+        Add cleaning before writing to DB (overriding django's default)
+        """
+        # check if the fields are correct before saving
         self.full_clean()
+        # call default save
         super(Course, self).save(*args, **kwargs)
 
     def Is_enrollment_open(self):

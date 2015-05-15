@@ -40,7 +40,7 @@
         <div class="list-group-item list-group-item-info toggle clearfix" id="dropdown-detail-{{ course.id }}" data-toggle="detail-{{ course.id }}" style="cursor: pointer; cursor: hand;">
             <div class="col-xs-6">
                 <h4 class="list-group-item-heading ">{{ course.Name }} {{ course.Year }} 
-                    {% if course.Is_ongoing%}<span class="label label-info">OnGoing</span>
+                    {% if course.Is_ongoing%}<span class="label label-info">Ongoing</span>
                     {% else %}<span class="label label-warning">Closed</span> {% endif %}
                 </h4> 
                 <p class="list-group-item-text"> Started on {{course.Start_date}}</p>

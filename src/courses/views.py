@@ -14,7 +14,8 @@ from . import models
 
 class CourseListView(LoginRequiredMixin, ListView):
     messages = {
-        'invalid_enroll_id': 'Unable to find the course you want enroll to. Please contact admins'
+        'invalid_enroll_id': 'Unable to find the course you want to enroll to. Please contact admins',
+        'course_closed': 'Enrollments for this course are closed at this time.'
     }
     model = models.Course
     template_name = "course_list.html"
@@ -49,6 +50,7 @@ class CourseListView(LoginRequiredMixin, ListView):
         return context
 
     def post(self, request):
+        # enroll_id corresponds to the course id
         enroll_id = self.request.POST.get('enroll_id') or False
         enroll_id = self._clean_enroll_id(enroll_id)
         if not enroll_id:
@@ -60,6 +62,9 @@ class CourseListView(LoginRequiredMixin, ListView):
             return HttpResponseRedirect(self.success_url)
 
     def _clean_enroll_id(self, enroll_id):
+        """
+        Verify that a course with this ID exists and is open for enrollments
+        """
         try:
             enroll_id = int(enroll_id)
             course = self.model.objects.filter(id=enroll_id)
@@ -67,6 +72,9 @@ class CourseListView(LoginRequiredMixin, ListView):
             course = False
         if not course:
             messages.error(self.request, self.messages['invalid_enroll_id'])
+            return False
+        if not course.Is_enrollment_open():
+            messages.error(self.request, self.messages['course_closed'])
             return False
         return enroll_id
 
