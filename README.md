@@ -59,3 +59,10 @@ Install the required libraries:
     sudo apt-get install libffi-dev
     pip install -r requirements.txt 
 
+Have one of the admins send you the `local.env` file (put it in src/TeaRoom/settings).
+
+Create data structures (sqlite database):
+    
+    cd src
+    ./manage.py migrate
+    ./manage.py createsuperuser
