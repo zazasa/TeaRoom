@@ -68,7 +68,7 @@ INSTALLED_APPS = (
     'accounts',
     'profiles',
     'courses',
-    
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -76,7 +76,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    
 )
 
 MIDDLEWARE_CLASSES = (
@@ -107,7 +106,10 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# Take the local machine time
+TIME_ZONE = None
+# Or define the time zone
+# TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
