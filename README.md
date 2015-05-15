@@ -43,16 +43,19 @@ Take a look at the docs for a detailed instructions guide.
 ## Quick install (any python version)
 
 Create a virtual python environment:
-`sudo pip install virtualenv`
-`virtualenv TeaRoomEnv`
-`cd TeaRoomEnv/`
-`source bin/activate`
+
+    sudo pip install virtualenv
+    virtualenv TeaRoomEnv
+    cd TeaRoomEnv/
+    source bin/activate
 
 Clone the repository:
-`git clone git@github.com:zazasa/TeaRoom.git`
-`cd TeaRoom/`
+
+    git clone git@github.com:zazasa/TeaRoom.git
+    cd TeaRoom/
 
 Install the required libraries:
-`sudo apt-get install libffi-dev`
-`pip install -r requirements.txt `
+
+    sudo apt-get install libffi-dev
+    pip install -r requirements.txt 
 
