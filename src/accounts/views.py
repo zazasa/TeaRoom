@@ -75,7 +75,7 @@ class SignUpView(bracesviews.AnonymousRequiredMixin,
         return context
 
 
-class FirstPasswordSetConfirmView(authviews.PasswordResetConfirmView):
+class FirstPasswordSetConfirmView(bracesviews.AnonymousRequiredMixin, authviews.PasswordResetConfirmView):
     template_name = 'accounts/first-password-set-confirm.html'
     form_class = forms.SetPasswordForm
     success_url = reverse_lazy('accounts:first-password-set-done')
