@@ -29,14 +29,12 @@ class EnrolledAdmin(admin.ModelAdmin):
         Admin View for Enrolled
     '''
     list_display = ('course', 'student', 'date_joined')
-    
+
     def __init__(self, *args, **kwargs):
         super(EnrolledAdmin, self).__init__(*args, **kwargs)
         self.list_display_links = (None, )
 
 admin.site.register(Enrolled, EnrolledAdmin)
-
-
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Assignment)
 admin.site.register(Test)

@@ -17,6 +17,7 @@
 <a class="btn btn-default btn-sm navbar-btn" href="{% url 'accounts:login' %}" role="button">Log in</a>
 <a class="btn btn-primary btn-sm navbar-btn" href="{% url 'accounts:signup' %}" role="button" >Sign up</a>
 {% else %}
+{# If not authenticated, take navbar-right as it is defined in base.html #}
 {{ block.super }}
 {% endif %}
 {% endblock %}

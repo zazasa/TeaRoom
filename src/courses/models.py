@@ -120,6 +120,3 @@ class Result(models.Model):
 
     def __str__(self):
         return '%s - %s' % (self.Test, self.User)
-    
-
-    

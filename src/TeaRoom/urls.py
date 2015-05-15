@@ -7,6 +7,7 @@ import accounts.urls
 import courses.urls
 from . import views
 
+# Links URLs to views
 urlpatterns = patterns(
     '',
     url(r'^$', views.HomePage.as_view(), name='home'),
