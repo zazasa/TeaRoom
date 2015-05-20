@@ -53,13 +53,14 @@ class Course(models.Model):
         self.full_clean()
         # call default save
         
-        course_folder = join(settings.USER_DATA_ROOT, 'courses', str(self).replace(' ', '_'))
+        course_folder = join('courses', str(self).replace(' ', '_'))
         self.Folder_path = course_folder
         
         super(Course, self).save(*args, **kwargs)
         # Create course folder in USER_DATA
-        if not isdir(course_folder):
-            makedirs(course_folder)
+        absolute_folder = join(settings.USER_DATA_ROOT, course_folder)
+        if not isdir(absolute_folder):
+            makedirs(absolute_folder)
 
     def Is_enrollment_open(self):
         return self.Is_always_open or (date.today() <= self.Enrollment_due_date)
@@ -125,12 +126,13 @@ class Assignment(models.Model):
         self.full_clean()
         # call default save
         
-        assignment_folder = join(settings.USER_DATA_ROOT, self.Course.Folder_path, str(self).replace(' ', '_'))
+        assignment_folder = join(self.Course.Folder_path, str(self).replace(' ', '_'))
         self.Folder_path = assignment_folder
         super(Assignment, self).save(*args, **kwargs)
         # Create course folder in USER_DATA
-        if not isdir(assignment_folder):
-            makedirs(assignment_folder)
+        absolute_folder = join(settings.USER_DATA_ROOT, assignment_folder)
+        if not isdir(absolute_folder):
+            makedirs(absolute_folder)
 
 
 class Exercise(models.Model):
@@ -160,12 +162,13 @@ class Exercise(models.Model):
         self.full_clean()
         # call default save
         
-        exercise_folder = join(settings.USER_DATA_ROOT, self.Assignment.Folder_path, str(self).replace(' ', '_'))
+        exercise_folder = join(self.Assignment.Folder_path, str(self).replace(' ', '_'))
         self.Folder_path = exercise_folder
         super(Exercise, self).save(*args, **kwargs)
         # Create course folder in USER_DATA
-        if not isdir(exercise_folder):
-            makedirs(exercise_folder)
+        absolute_folder = join(settings.USER_DATA_ROOT, exercise_folder)
+        if not isdir(absolute_folder):
+            makedirs(absolute_folder)
 
     def update_file(self, name, ftype):
         try:
