@@ -7,9 +7,10 @@ from django.views.generic.base import TemplateResponseMixin, ContextMixin, Templ
 from braces.views import LoginRequiredMixin, CsrfExemptMixin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
+from django.conf import settings
 # Create your views here.
 from accounts.models import User
-from . import models
+from .models import *
 
 
 class CourseListView(LoginRequiredMixin, ListView):
@@ -17,7 +18,8 @@ class CourseListView(LoginRequiredMixin, ListView):
         'invalid_enroll_id': 'Unable to find the course you want to enroll to. Please contact admins',
         'course_closed': 'Enrollments for this course are closed at this time.'
     }
-    model = models.Course
+    model = Course
+    context_object_name = 'courses'
     template_name = "course_list.html"
     success_url = reverse_lazy('courses:course-list')
 
@@ -38,13 +40,13 @@ class CourseListView(LoginRequiredMixin, ListView):
             dataSet = dataSet.filter(Students__id=self.request.user.id)
         else:
             dataSet = dataSet.exclude(Students__id=self.request.user.id)
-
         return dataSet
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(CourseListView, self).get_context_data(**kwargs)
 
+        context['mycourses'] = self._get_mycourses(context['object_list'])
         context['show_other'] = self.show_other
         context['show_closed'] = self.show_closed
         return context
@@ -67,7 +69,7 @@ class CourseListView(LoginRequiredMixin, ListView):
         """
         try:
             enroll_id = int(enroll_id)
-            course = self.model.objects.filter(id=enroll_id)
+            course = self.model.objects.get(id=enroll_id)
         except:
             course = False
         if not course:
@@ -78,6 +80,38 @@ class CourseListView(LoginRequiredMixin, ListView):
             return False
         return enroll_id
 
+    # list of courses to which the user is enrolled
+    def _get_mycourses(self, courses_list):
+        mycourses = []
+        for course in courses_list.filter(Students__id=self.request.user.id):
+            mycourses.append(course.id)
+        return mycourses
 
-class HelpView(TemplateView):
-    template_name = "help.html"
+
+class AssignmentListView(LoginRequiredMixin, ListView):
+    
+    template_name = "assignment_list.html"
+    context_object_name = 'courses'
+
+    def get_queryset(self):
+        courses_list = Course.objects.filter(Students__id=self.request.user.id)
+        return courses_list
+
+    def get_context_data(self, **kwargs):
+        context = super(AssignmentListView, self).get_context_data(**kwargs)
+        courses_list = context['courses']
+        if courses_list:
+            selected_course_id = self.request.GET.get('selected_course_id') or False
+            if selected_course_id:
+                try:
+                    selected_course = courses_list.get(id=selected_course_id)
+                except:
+                    selected_course = courses_list[0]
+            else:
+                selected_course = courses_list[0]
+            assignment_list = Assignment.objects.filter(Course=selected_course)
+            context['assignments'] = assignment_list
+            context['selected_course'] = selected_course
+
+        return context
+    

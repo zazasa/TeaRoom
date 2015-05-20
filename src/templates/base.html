@@ -20,7 +20,8 @@
 
   <!-- Bootstrap core CSS -->
   <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-  <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" rel="stylesheet">
+  <link href="{% static 'bootstrap-select/dist/css/bootstrap-select.min.css' %}" rel="stylesheet">
+  {# <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" rel="stylesheet"> #}
 
   <!-- Custom styles for this site -->
   {% block styles %}
@@ -136,6 +137,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'bootstrap-select/dist/js/bootstrap-select.min.js' %}"></script>
     {% block scripts %}
     {% endblock scripts %}
   </body>
