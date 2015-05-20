@@ -18,7 +18,6 @@ MEDIA_ROOT = join(BASE_DIR, 'media')
 MEDIA_URL = "/media/"
 
 USER_DATA_ROOT = join(BASE_DIR, 'USER_DATA')
-# MEDIA_URL = "/media/"
 
 try:
     with open(join(TEMPLATE_DIRS[0], '_brandname.html')) as f:

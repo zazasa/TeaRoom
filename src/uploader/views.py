@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib import messages
 from os.path import join, isdir
-from os import path, makedirs, listdir
+from os import path, makedirs, listdir, walk
 from django.contrib.auth import authenticate
 from shutil import rmtree, copytree
 import time
@@ -14,6 +14,7 @@ import subprocess
 import sys
 import pickle
 from courses.models import Course, Assignment, Exercise, UserFile
+
 
 # Create your views here.
 class UploadAssignmentView(TemplateView):
@@ -38,9 +39,11 @@ class UploadAssignmentView(TemplateView):
             f = self.request.FILES['file']
             try:
                 temp_folder = self.copy_and_unzip(f)
-                temp_subfolder = join(temp_folder, listdir(temp_folder)[0])
+                # temp_subfolder = join(temp_folder, listdir(temp_folder)[0])
+                r, d, f = walk(temp_folder).next()
+                temp_subfolder = join(temp_folder, d[0])
                 self.parse_temp_folder(temp_subfolder)
-                # rmtree(temp_folder)
+                rmtree(temp_folder)
                 messages.info(self.request, self.messages['success'])
             except Exception as e:
                 messages.error(self.request, self.messages['generic_error'] % repr(e))
