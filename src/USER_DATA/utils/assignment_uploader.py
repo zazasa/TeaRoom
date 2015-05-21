@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-19 11:25:31
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-20 12:53:19
+# @Last Modified time: 2015-05-20 21:14:01
 import argparse
 import requests
 import getpass
@@ -15,7 +15,7 @@ def get_user_and_pass():
     if DEBUG:
         auth_data = {
             'username': 'salvatore.zaza@gmail.com',
-            'password': 'ominozzo2',
+            'password': 'password',
         }
     else:
         auth_data = {

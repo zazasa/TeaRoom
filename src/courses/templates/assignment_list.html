@@ -36,18 +36,34 @@
 
 <div class="row-fluid">
     <div class="list-group">
-    {% for assignment in assignments  %}
-        <a href="#" class="list-group-item active">
-            <h4 class="list-group-item-heading">{{assignment.Title}}</h4>
-        </a>
-        <br>
-        {% empty %}
-            <a href="#" class="list-group-item list-group-item-warning">
-                <h4 class="list-group-item-heading">There's no assignments for this course.</h4>
-            </a>
-        {% endfor %}
+
+
+      {% for assignment in assignments %}
+        <div class="list-group-item list-group-item-info toggle clearfix" id="dropdown-detail-{{ assignment.id }}" data-toggle="detail-{{ assignment.id }}" style="cursor: pointer; cursor: hand;">
+                <h4 class="list-group-item-heading ">{{ assignment.Title }}
+                </h4> 
+        </div>
+
+        <div id="detail-{{ assignment.id }}" style="display:none">
+            <div class="panel panel-primary">                  
+              <div class="panel-body">
+                <ul class="list-group">
+                    {% for exercise in exercises  %}
+                        {% if exercise.Assignment == assignment %}
+                            <li class="list-group-item">{{exercise.Description}}</li>    
+                        {% endif %}
+                    {% empty %}
+                        <p> There are no exercises assigned. </p>
+                    {% endfor %}                    
+                </ul>
+            </div>
+        </div>
+
     </div>
-</div>
+    <br>
+    {% empty %}
+    <p class="list-group-item list-group-item-text list-group-item-warning"> There's no assignments for this course.</p>
+    {% endfor %}
 
 {% endblock container %}
 

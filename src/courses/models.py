@@ -69,21 +69,21 @@ class Course(models.Model):
         return date.today() <= self.End_date
 
     def enroll(self, user_id):
-        print self.id, user_id
         user = User.objects.get(id=user_id)
-        e = Enrolled(course=self, student=user)
+        e = Enrolled(Course=self, Student=user)
         e.save()
 
 
 class Enrolled(models.Model):
 
-    student = models.ForeignKey(User)
-    course = models.ForeignKey(Course)
-    date_joined = models.DateField(editable=False, auto_now_add=True)
+    Student = models.ForeignKey(User)
+    Course = models.ForeignKey(Course)
+    Date_joined = models.DateField(editable=False, auto_now_add=True)
 
     class Meta:
         verbose_name = "Enrolled"
         verbose_name_plural = "2-Enrolled"
+        unique_together = (("Student", "Course"),)
 
 
 class Assignment(models.Model):
@@ -144,6 +144,7 @@ class Exercise(models.Model):
     Number = models.IntegerField()  # cardinal of test
     Points = models.IntegerField(blank=True, null=True)
     Folder_path = models.CharField('Folder_path', max_length=200, null=True, blank=True, editable=False)
+    Students = models.ManyToManyField(User, through='Assigned')
 
     class Meta:
         verbose_name = "Exercise"
@@ -151,7 +152,7 @@ class Exercise(models.Model):
         unique_together = (("Assignment", "Number"),)
 
     def __str__(self):
-        return 'ex_%s' % (self.Number)
+        return '%s - %s - %s' % (self.Assignment.Course, self.Assignment, self.Description)
 
     def save(self, *args, **kwargs):
         """
@@ -175,7 +176,6 @@ class Exercise(models.Model):
             f = UserFile.objects.get(Exercise=self, Name=name, Type=ftype)
         except:
             f = UserFile(Exercise=self, Name=name, Type=ftype)
-            print ftype
             if ftype == 'to_complete':
                 folder_path = join(self.Folder_path, 'user_files')
             elif ftype == 'to_test':
@@ -184,6 +184,35 @@ class Exercise(models.Model):
                 raise ValidationError('bad file type')
             f.Folder_path = folder_path
             f.save()
+
+
+class Assigned(models.Model):
+
+    Student = models.ForeignKey(User)
+    Exercise = models.ForeignKey(Exercise)
+    Sate_assigned = models.DateField(editable=False, auto_now_add=True)
+    Assigned_by = models.CharField('Assigned By', max_length=50, editable=False, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Assigned"
+        verbose_name_plural = "5-Assigned"
+        unique_together = (("Student", "Exercise"),)
+
+    def clean(self, *args, **kwargs):
+        # add custom validation here
+        if not self.Student.enrolled_set.filter(Course=self.Exercise.Assignment.Course):
+            raise ValidationError('The user %s is not enrolled in the course %s' % (self.Student, self.Exercise.Assignment.Course))
+        # call default cleaning
+        super(Assigned, self).clean(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        """
+        1 - Add cleaning before writing to DB (overriding django's default)
+        """
+        # check if the fields are correct before saving
+        self.full_clean()
+        # call default save
+        super(Assigned, self).save(*args, **kwargs)
 
 
 class Result(models.Model):
@@ -196,7 +225,7 @@ class Result(models.Model):
 
     class Meta:
         verbose_name = "Result"
-        verbose_name_plural = "5-Results"
+        verbose_name_plural = "6-Results"
 
     def __str__(self):
         return '%s - %s' % (self.Exercise, self.User)
@@ -212,7 +241,7 @@ class UserFile(models.Model):
 
     class Meta:
         verbose_name = "UserFile"
-        verbose_name_plural = "UserFiles"
+        verbose_name_plural = "7-UserFiles"
 
     def __str__(self):
         return "%s" % join(self.Folder_path, self.Name)

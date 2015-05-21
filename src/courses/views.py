@@ -37,9 +37,9 @@ class CourseListView(LoginRequiredMixin, ListView):
         else:
             dataSet = self.model.objects.all()
         if not self.show_other:
-            dataSet = dataSet.filter(Students__id=self.request.user.id)
+            dataSet = dataSet.filter(Students=self.request.user)
         else:
-            dataSet = dataSet.exclude(Students__id=self.request.user.id)
+            dataSet = dataSet.exclude(Students=self.request.user)
         return dataSet
 
     def get_context_data(self, **kwargs):
@@ -83,7 +83,7 @@ class CourseListView(LoginRequiredMixin, ListView):
     # list of courses to which the user is enrolled
     def _get_mycourses(self, courses_list):
         mycourses = []
-        for course in courses_list.filter(Students__id=self.request.user.id):
+        for course in courses_list.filter(Students=self.request.user):
             mycourses.append(course.id)
         return mycourses
 
@@ -94,7 +94,7 @@ class AssignmentListView(LoginRequiredMixin, ListView):
     context_object_name = 'courses'
 
     def get_queryset(self):
-        courses_list = Course.objects.filter(Students__id=self.request.user.id)
+        courses_list = Course.objects.filter(Students=self.request.user)
         return courses_list
 
     def get_context_data(self, **kwargs):
@@ -110,7 +110,10 @@ class AssignmentListView(LoginRequiredMixin, ListView):
             else:
                 selected_course = courses_list[0]
             assignment_list = Assignment.objects.filter(Course=selected_course)
+            exercise_list = self.request.user.exercise_set.all()
+            print '>>>>>>>>>>>>>>>', exercise_list
             context['assignments'] = assignment_list
+            context['exercises'] = exercise_list
             context['selected_course'] = selected_course
 
         return context

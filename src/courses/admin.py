@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-11 16:35:37
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-20 14:50:41
+# @Last Modified time: 2015-05-21 19:35:31
 
 from django.contrib import admin
 # Register your models here.
@@ -28,7 +28,7 @@ class EnrolledAdmin(admin.ModelAdmin):
     '''
         Admin View for Enrolled
     '''
-    list_display = ('course', 'student', 'date_joined')
+    list_display = ('Course', 'Student', 'Date_joined')
 
     def __init__(self, *args, **kwargs):
         super(EnrolledAdmin, self).__init__(*args, **kwargs)
@@ -44,6 +44,11 @@ class AssignmentAdmin(admin.ModelAdmin):
     readonly_fields = ('Folder_path',)
     list_filter = []
 
+# from django.contrib.admin.helpers import ActionForm
+# from django import forms
+# class ExerciseFormAdmin(ActionForm):
+#     price = forms.IntegerField(required=False)
+
 
 class ExerciseAdmin(admin.ModelAdmin):
     '''
@@ -54,6 +59,8 @@ class ExerciseAdmin(admin.ModelAdmin):
     readonly_fields = ('Folder_path',)
 
     list_filter = []
+
+    # action_form = ExerciseFormAdmin
 
     def file_to_complete_list(self, obj):
         dataSet = UserFile.objects.filter(Exercise=obj, Type='to_complete')
@@ -70,7 +77,24 @@ class ExerciseAdmin(admin.ModelAdmin):
             filelist.append(item.Name)
         return ','.join(filelist)
     file_to_test_list.short_description = 'To Test'
-    
+
+
+class AssignedAdmin(admin.ModelAdmin):
+    '''
+        Admin View for Enrolled
+    '''
+    list_display = ('Student', 'Exercise', 'Assigned_by')
+
+    def __init__(self, *args, **kwargs):
+        super(AssignedAdmin, self).__init__(*args, **kwargs)
+        self.list_display_links = (None, )
+
+    def save_model(self, request, obj, form, change):
+        if getattr(obj, 'Assigned_by', None) is None:
+            obj.Assigned_by = request.user
+            print request.user
+        obj.save()
+
 
 class UserFileAdmin(admin.ModelAdmin):
     '''
@@ -87,3 +111,4 @@ admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Exercise, ExerciseAdmin)
 admin.site.register(Result)
 admin.site.register(UserFile, UserFileAdmin)
+admin.site.register(Assigned, AssignedAdmin)
