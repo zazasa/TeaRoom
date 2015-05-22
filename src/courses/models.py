@@ -163,7 +163,7 @@ class Exercise(models.Model):
         self.full_clean()
         # call default save
         
-        exercise_folder = join(self.Assignment.Folder_path, str(self).replace(' ', '_'))
+        exercise_folder = join(self.Assignment.Folder_path, 'ex_' + str(self.Number))
         self.Folder_path = exercise_folder
         super(Exercise, self).save(*args, **kwargs)
         # Create course folder in USER_DATA
@@ -222,6 +222,7 @@ class Result(models.Model):
     User = models.ForeignKey(User, limit_choices_to={'is_staff': False})
     Creation_date = models.DateField(editable=False, auto_now_add=True)
     Update_date = models.DateField(editable=False, blank=True)
+    Pass = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = "Result"

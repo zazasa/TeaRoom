@@ -69,7 +69,8 @@
           <ul class="nav navbar-nav navbar-right">
             {% block navbar-right %}
             {# Display current date and time #}
-            <li class="nav navbar-text"><div>{% now "F j, Y, H:i" %}</div></li>
+            {# <li class="nav navbar-text"><div>{% now "F j, Y, H:i" %}</div></li> #}
+            <li class="nav navbar-text"><div>{% now "F j, H:i" %}</div></li>
             {% if user.is_authenticated %}
             <li class="dropdown">
               <a href="#" class="dropdown-toggle profile-menu" data-toggle="dropdown">

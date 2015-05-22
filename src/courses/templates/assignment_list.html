@@ -50,7 +50,11 @@
                 <ul class="list-group">
                     {% for exercise in exercises  %}
                         {% if exercise.Assignment == assignment %}
-                            <li class="list-group-item">{{exercise.Description}}</li>    
+                            <li class="list-group-item clearfix">{{exercise.Description}} 
+                                <a href="{% url 'courses:download-user-file' %}?ex_id={{exercise.id}}" type="button" class="btn btn-sm btn-primary pull-right">Download</a>     
+                            </li>
+                            
+
                         {% endif %}
                     {% empty %}
                         <p> There are no exercises assigned. </p>

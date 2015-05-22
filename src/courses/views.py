@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic.edit import ProcessFormView
-from django.views.generic.base import TemplateResponseMixin, ContextMixin, TemplateView
+from django.views.generic.base import TemplateResponseMixin, ContextMixin, TemplateView, View
 from braces.views import LoginRequiredMixin, CsrfExemptMixin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
@@ -11,6 +11,9 @@ from django.conf import settings
 # Create your views here.
 from accounts.models import User
 from .models import *
+from django.http import HttpResponse, HttpResponseNotFound
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
 
 
 class CourseListView(LoginRequiredMixin, ListView):
@@ -111,10 +114,26 @@ class AssignmentListView(LoginRequiredMixin, ListView):
                 selected_course = courses_list[0]
             assignment_list = Assignment.objects.filter(Course=selected_course)
             exercise_list = self.request.user.exercise_set.all()
-            print '>>>>>>>>>>>>>>>', exercise_list
             context['assignments'] = assignment_list
             context['exercises'] = exercise_list
             context['selected_course'] = selected_course
 
         return context
+
     
+class DownloadUserFileView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        try:
+            ex_id = request.GET.get('ex_id') or False
+            e = Exercise.objects.get(id=ex_id)
+
+            filename = 'ex_package.tar.gz'
+            filepath = join(settings.USER_DATA_ROOT, str(e.Folder_path), filename)
+
+            # You got the zip! Now, return it!
+            response = HttpResponse(open(filepath, 'rb'), content_type='application/x-gtar')
+            response['Content-Disposition'] = 'attachment; filename=%s' % filename
+            return response
+        except:
+            return HttpResponseNotFound('Bad exercise package configuration. Please contact admins.')
+        
