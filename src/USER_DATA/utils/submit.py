@@ -3,14 +3,13 @@
 # @Author: salvo
 # @Date:   2015-05-22 14:03:30
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-24 15:39:26
+# @Last Modified time: 2015-05-24 18:19:40
 
 from os.path import join, dirname
 from os import remove
 import tarfile
 import requests
 import getpass
-import binascii
 import sys
 
 from subprocess import Popen, PIPE, STDOUT
@@ -31,7 +30,7 @@ def get_user_and_pass():
     auth_data = {
         'username': raw_input("Enter email: "),
         'password': getpass.getpass('Password: '),
-        'secret_key': binascii.unhexlify(str(hex(SUBMIT_KEY))[2:-1])
+        'submit_key': SUBMIT_KEY
     }
     return auth_data
 
@@ -53,7 +52,6 @@ def upload_package(auth_data, filename):
 
     data = auth_data
     data['ex_id'] = EXERCISE_ID
-    data['submit_key'] = SUBMIT_KEY
     data['type'] = 'upload'
 
     csrftoken = r.cookies['csrftoken']
@@ -67,15 +65,14 @@ def upload_package(auth_data, filename):
 
 def download_and_execute_test(auth_data):
     s = requests.session()
-    global r
     r = s.get(URL, verify=False)
-    data = auth_data
-    data['ex_id'] = EXERCISE_ID
-    data['submit_key'] = SUBMIT_KEY
-    data['type'] = 'download'
-    
+
     csrftoken = r.cookies['csrftoken']
     headers = {'X-CSRFToken': csrftoken, 'Referer': URL}
+
+    data = auth_data
+    data['ex_id'] = EXERCISE_ID
+    data['type'] = 'download'  
 
     r = requests.post(URL, data=data, headers=headers, cookies=r.cookies)
     if r.headers['content-type'] == 'application/x-bytecode.python':
