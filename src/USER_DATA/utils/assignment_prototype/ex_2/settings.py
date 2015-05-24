@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-18 17:33:58
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-19 18:17:32
+# @Last Modified time: 2015-05-24 13:20:57
 import os
 
 local_folder = os.path.dirname(os.path.abspath(__file__))
@@ -20,5 +20,5 @@ EX_SETTINGS = {
     'FILES_TO_COMPLETE': [file for file in os.listdir(user_files_folder) if file.endswith('.py') and not file.startswith('__')],
     
     # Specify file manually if there are supplemental py files
-    'FILES_TO_TEST': [file for file in os.listdir(test_files_folder) if file.endswith('.py') and not file.startswith('__')],
+    'FILE_TO_TEST': 'test.py',
 }

@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-18 17:34:56
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-18 18:14:58
+# @Last Modified time: 2015-05-24 14:50:13
 
 # add external folder to import path
 if __name__ == '__main__' and __package__ is None:
@@ -33,5 +33,6 @@ for planet in PLANETS:
         v = escape_velocity(planet.mass, planet.radius)
         err = abs(1 - v / planet.velocity)
         assert err < 0.05
+        print 'Nice job.'
     except:
-        sys.exit('Fails to calculate for planet: %s, result: %s' % (planet.name, v))
+        print 'Fails to calculate for planet: %s, result: %s' % (planet.name, v)

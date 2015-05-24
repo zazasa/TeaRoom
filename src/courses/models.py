@@ -8,6 +8,7 @@ from accounts.models import User
 from os.path import join, isdir
 from os import makedirs
 from django.conf import settings
+import random, string
 
 class CourseManager(models.Manager):
     def filter_ongoing(self):
@@ -145,6 +146,7 @@ class Exercise(models.Model):
     Points = models.IntegerField(blank=True, null=True)
     Folder_path = models.CharField('Folder_path', max_length=200, null=True, blank=True, editable=False)
     Students = models.ManyToManyField(User, through='Assigned')
+    Submit_key = models.CharField('Submit key', max_length=25, editable=False)
 
     class Meta:
         verbose_name = "Exercise"
@@ -165,6 +167,7 @@ class Exercise(models.Model):
         
         exercise_folder = join(self.Assignment.Folder_path, 'ex_' + str(self.Number))
         self.Folder_path = exercise_folder
+        self.Submit_key = ''.join(random.choice(string.letters + string.digits) for i in range(random.randint(15, 25)))
         super(Exercise, self).save(*args, **kwargs)
         # Create course folder in USER_DATA
         absolute_folder = join(settings.USER_DATA_ROOT, exercise_folder)
@@ -184,6 +187,9 @@ class Exercise(models.Model):
                 raise ValidationError('bad file type')
             f.Folder_path = folder_path
             f.save()
+
+    def remove_all_files(self):
+        UserFile.objects.filter(Exercise=self).delete()
 
 
 class Assigned(models.Model):
@@ -243,6 +249,7 @@ class UserFile(models.Model):
     class Meta:
         verbose_name = "UserFile"
         verbose_name_plural = "7-UserFiles"
+        unique_together = (("Exercise", "Name"),)
 
     def __str__(self):
         return "%s" % join(self.Folder_path, self.Name)

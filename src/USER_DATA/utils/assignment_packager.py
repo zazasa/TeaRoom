@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-19 17:02:02
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-22 18:43:11
+# @Last Modified time: 2015-05-24 12:32:19
 import argparse
 import os
 import imp
@@ -15,7 +15,7 @@ import tarfile
 
 def make_tarfile(output_filename, source_dir):
     with tarfile.open(output_filename, "w:gz") as tar:
-        tar.add(source_dir)
+        tar.add(source_dir, arcname=os.path.basename(source_dir))
 
 
 def dump_settings(assignment_folder):
@@ -53,7 +53,6 @@ if __name__ == '__main__':
     assignment_name = os.path.basename(assignment_folder)
 
     dump_settings(assignment_folder)
-
     make_tarfile(join(os.path.dirname(assignment_folder), assignment_name + '.tar.gz'), assignment_folder)
 
 

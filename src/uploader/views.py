@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, View
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.contrib import messages
-from os.path import join, isdir
+from os.path import join, isdir, dirname
 from os import path, makedirs, listdir, walk, remove
 from django.contrib.auth import authenticate
 from shutil import rmtree, copytree
@@ -17,11 +17,15 @@ from courses.models import Course, Assignment, Exercise, UserFile
 from py_compile import compile
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
+import binascii
+from django.http import HttpResponse, HttpResponseNotFound
+import traceback
 
 
 # Create your views here.
 class UploadAssignmentView(TemplateView):
     template_name = "upload_assignment.txt"
+    content_type = 'text/plain'
     messages = {
         'success': 'File upload successful.',
         'generic_error': 'exception: %s',
@@ -45,12 +49,12 @@ class UploadAssignmentView(TemplateView):
                 copy_and_unzip(f, temp_folder)
                 # temp_subfolder = join(temp_folder, listdir(temp_folder)[0])
                 r, d, f = walk(temp_folder).next()
-                temp_subfolder = join(temp_folder, d[0])
+                temp_subfolder = join(temp_folder, d[0])        
                 self.parse_temp_folder(temp_subfolder)
                 rmtree(temp_folder)
                 messages.info(self.request, self.messages['success'])
-            except Exception as e:
-                messages.error(self.request, self.messages['generic_error'] % repr(e))
+            except Exception:
+                messages.error(self.request, self.messages['generic_error'] % traceback.format_exc())
         else:
             messages.error(self.request, self.messages['auth_error'])
         return self.render_to_response(self.get_context_data())
@@ -104,33 +108,34 @@ class UploadAssignmentView(TemplateView):
             dest_user_files = join(settings.USER_DATA_ROOT, exercise_folder, 'user_files')
             dest_test_files = join(settings.USER_DATA_ROOT, exercise_folder, 'test_files')
 
-            if isdir(dest_user_files):
-                rmtree(dest_user_files)
-
-            if isdir(dest_test_files):
-                rmtree(dest_test_files)
+            if isdir(dest_user_files): rmtree(dest_user_files)
+            if isdir(dest_test_files): rmtree(dest_test_files)
+            e.remove_all_files()
 
             copytree(join(temp_folder, ex_setting['RELATIVE_FOLDER'], 'user_files'), dest_user_files)
             copytree(join(temp_folder, ex_setting['RELATIVE_FOLDER'], 'test_files'), dest_test_files)
 
-            for filename in ex_setting['FILES_TO_COMPLETE']:
-                e.update_file(filename, 'to_complete')
-            for filename in ex_setting['FILES_TO_TEST']:
-                e.update_file(filename, 'to_test')
+            e.update_file(ex_setting['FILE_TO_TEST'], 'to_test')
+            #  Compile test file
+            test_file = join(dest_test_files, ex_setting['FILE_TO_TEST'])
+            compile(test_file, test_file + 'c', doraise=True)
 
-            file_to_complete_list = [item.Name for item in e.userfile_set.filter(Type='to_complete')]
-            self.build_submit_script(e.id, file_to_complete_list, dest_user_files)
+            for filename in ex_setting['FILES_TO_COMPLETE']: e.update_file(filename, 'to_complete')
+
+            self.build_submit_script(e, dest_user_files)
             self.create_user_package(dest_user_files, exercise_folder)
 
-    def build_submit_script(self, ex_id, file_list, dest_user_files):
+    def build_submit_script(self, e, dest_user_files):
+        file_list = [item.Name for item in e.userfile_set.filter(Type='to_complete')]
         original_file = join(settings.USER_DATA_ROOT, 'utils/submit.py')
         destination_file = join(dest_user_files, 'submit.py')
         with open(original_file, 'rb') as original: data = original.read()
         with open(destination_file, 'wb') as modified:
-            data = "EXERCISE_ID = %s \n" % str(ex_id) + data
+            data = "EXERCISE_ID = %s \n" % str(e.id) + data
             data = "FILES_TO_COMPLETE = %s \n" % str(file_list) + data
+            data = "SUBMIT_KEY = %s \n" % str(int(binascii.hexlify(str(e.Submit_key)), 16)) + data
             modified.write(data)
-        compile(destination_file)
+        compile(destination_file, doraise=True)
         remove(destination_file)
 
     def create_user_package(self, dest_user_files, ex_folder):
@@ -151,8 +156,7 @@ def save_uploaded_file(f, filepath):
 
 def copy_and_unzip(f, dest_folder):
     if not isdir(dest_folder): makedirs(dest_folder)
-    filepath = join(dest_folder, f.name)
-    print 'XXXXXXXXX', filepath
+    filepath = join(dirname(dest_folder), f.name)
     save_uploaded_file(f, filepath)
     tfile = tarfile.open(filepath, 'r:gz')
     tfile.extractall(dest_folder)
@@ -161,11 +165,12 @@ def copy_and_unzip(f, dest_folder):
 # Create your views here.
 class UploadResultView(TemplateView):
     template_name = "upload_result.txt"
+    content_type = 'text/plain'
     messages = {
-        'notexist': 'Bad exercise id. Please contact admins.',
+        'notexist': 'Submit file malformed. Please contact admins. Errorcode: %s',
         'generic_error': 'exception: %s',
         'auth_error': 'User or password invalid',
-        'success': 'result submit successful',
+        'success': 'Result submit successful',
     }
 
     def authenticate(self):
@@ -177,30 +182,43 @@ class UploadResultView(TemplateView):
         else:
             return False
 
+    def check_submit_key(self, e, submit_key):
+        try:
+            submit_key = binascii.unhexlify(str(hex(int(submit_key)))[2:-1])
+            assert(submit_key == str(e.Submit_key))
+        except:
+            raise ObjectDoesNotExist('Wrong submit key.')
+
+    def download_test_file(self, e):
+        userfile = e.userfile_set.get(Type='to_test')
+        filename = userfile.Name
+        filepath = str(userfile)
+        filepath = join(settings.USER_DATA_ROOT, filepath)
+        # You got the zip! Now, return it!
+        
+        response = HttpResponse(open(filepath, 'rb'), content_type='application/x-bytecode.python')
+        response['Content-Disposition'] = 'attachment; filename=%s' % filename
+        return response
+
     def post(self, request):
         user = self.authenticate()
         if user:
             ex_id = self.request.POST.get('ex_id')
+            req_type = self.request.POST.get('type')
+            submit_key = self.request.POST.get('submit_key')
             try:
                 e = user.exercise_set.get(id=ex_id)
+                self.check_submit_key(e, submit_key)
+                if req_type == 'download':
+                    return self.download_test_file(e)
                 f = self.request.FILES['file']
                 res_folder = self.create_result_folder(user, e)
-                print 'ZZZZZZZZZ ', res_folder
                 copy_and_unzip(f, join(res_folder, 'user_files'))
                 messages.info(self.request, self.messages['success'])
-            except ObjectDoesNotExist:
-                messages.error(self.request, self.messages['notexist'])
-        #     try:
-        #         temp_folder = join(settings.USER_DATA_ROOT, 'temp/temp' + str(int(time.time() * 100000)))
-        #         copy_and_unzip(f, temp_folder)
-        #         # temp_subfolder = join(temp_folder, listdir(temp_folder)[0])
-        #         r, d, f = walk(temp_folder).next()
-        #         temp_subfolder = join(temp_folder, d[0])
-        #         self.parse_temp_folder(temp_subfolder)
-        #         rmtree(temp_folder)
-        #         messages.info(self.request, self.messages['success'])
-            except Exception as e:
-                messages.error(self.request, self.messages['generic_error'] % repr(e))
+            except ObjectDoesNotExist as e:
+                messages.error(self.request, self.messages['notexist'] % repr(e))
+            except Exception:
+                messages.error(self.request, self.messages['generic_error'] % traceback.format_exc())
 
         else:
             messages.error(self.request, self.messages['auth_error'])
@@ -223,8 +241,3 @@ class UploadResultView(TemplateView):
         copytree(user_files, join(timed_folder, 'user_files'))
 
         return timed_folder
-
-
-
-
-

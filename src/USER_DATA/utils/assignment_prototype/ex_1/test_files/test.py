@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-18 13:44:07
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-18 14:38:29
+# @Last Modified time: 2015-05-24 14:51:11
 
 # add external folder to import path
 if __name__ == '__main__' and __package__ is None:
@@ -15,5 +15,6 @@ from user_files.calculate_g import g_values
 try:
     assert round(g_values[0], 2) == 6.67
     assert round(g_values[1], 1) == 0.2
+    print 'Nice Job.'
 except:
-    sys.exit('Wrong values, try again.')
+    print 'Wrong values, try again.'

@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-11 17:31:12
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-22 18:59:30
+# @Last Modified time: 2015-05-24 12:54:45
 
 from django.conf.urls import patterns, url
 
