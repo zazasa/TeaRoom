@@ -13,13 +13,14 @@ import tarfile
 import subprocess
 import sys
 import pickle
-from courses.models import Course, Assignment, Exercise, UserFile
+from courses.models import Course, Assignment, Exercise, UserFile, Result
 from py_compile import compile
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 import binascii
 from django.http import HttpResponse, HttpResponseNotFound
 import traceback
+from subprocess import Popen, PIPE, STDOUT
 
 
 # Create your views here.
@@ -49,7 +50,7 @@ class UploadAssignmentView(TemplateView):
                 copy_and_unzip(f, temp_folder)
                 # temp_subfolder = join(temp_folder, listdir(temp_folder)[0])
                 r, d, f = walk(temp_folder).next()
-                temp_subfolder = join(temp_folder, d[0])        
+                temp_subfolder = join(temp_folder, d[0])
                 self.parse_temp_folder(temp_subfolder)
                 rmtree(temp_folder)
                 messages.info(self.request, self.messages['success'])
@@ -116,6 +117,7 @@ class UploadAssignmentView(TemplateView):
             copytree(join(temp_folder, ex_setting['RELATIVE_FOLDER'], 'test_files'), dest_test_files)
 
             e.update_file(ex_setting['FILE_TO_TEST'], 'to_test')
+            e.update_file(ex_setting['OUTPUT_PARSER'], 'parser')
             #  Compile test file
             test_file = join(dest_test_files, ex_setting['FILE_TO_TEST'])
             compile(test_file, test_file + 'c', doraise=True)
@@ -171,6 +173,8 @@ class UploadResultView(TemplateView):
         'generic_error': 'exception: %s',
         'auth_error': 'User or password invalid',
         'success': 'Result submit successful',
+        'result': 'Exercise result: %s',
+        'timedelta': 'Please wait 10 min from last submit. '
     }
 
     def authenticate(self):
@@ -200,6 +204,15 @@ class UploadResultView(TemplateView):
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
 
+    def check_submit_delay(self, e):
+        res_set = e.result_set.all().order_by('-Creation_date')
+        if res_set:
+            r = res_set[0]
+            deltamin = (datetime.utcnow().replace(tzinfo=r.Creation_date.tzinfo) - r.Creation_date).seconds / 60
+            if deltamin < 10:
+                return False
+        return True
+
     def post(self, request):
         user = self.authenticate()
         if user:
@@ -208,13 +221,20 @@ class UploadResultView(TemplateView):
             submit_key = self.request.POST.get('submit_key')
             try:
                 e = user.exercise_set.get(id=ex_id)
-                self.check_submit_key(e, submit_key)
-                if req_type == 'download':
-                    return self.download_test_file(e)
-                f = self.request.FILES['file']
-                res_folder = self.create_result_folder(user, e)
-                copy_and_unzip(f, join(res_folder, 'user_files'))
-                messages.info(self.request, self.messages['success'])
+                if not self.check_submit_delay(e):
+                    messages.info(self.request, self.messages['timedelta'])
+                else:
+                    self.check_submit_key(e, submit_key)
+                    if req_type == 'download':
+                        return self.download_test_file(e)
+                    f = self.request.FILES['file']
+                    res_folder = self.create_result_folder(user, e)
+                    copy_and_unzip(f, join(res_folder, 'user_files'))
+                    passed, out = self.execute_parser(e, res_folder)
+                    r = Result(Exercise=e, User=user, Pass=passed, Parser_output=out)
+                    r.save()
+                    messages.info(self.request, self.messages['success'])
+                    messages.info(self.request, self.messages['result'] % out)
             except ObjectDoesNotExist as e:
                 messages.error(self.request, self.messages['notexist'] % repr(e))
             except Exception:
@@ -224,6 +244,18 @@ class UploadResultView(TemplateView):
             messages.error(self.request, self.messages['auth_error'])
 
         return self.render_to_response(self.get_context_data())
+
+    def execute_parser(self, e, res_folder):
+    
+        parser_file = join(settings.USER_DATA_ROOT, str(e.userfile_set.get(Type='parser')))
+        parser_cwd = join(dirname(parser_file))
+        output_file = join(res_folder, 'user_files/output.txt')
+        p = Popen(['python', parser_file, output_file], stdout=PIPE, stdin=PIPE, stderr=PIPE, cwd=parser_cwd)
+        # put the pyc in the stdin of the subprocess (exec test)
+        out, err = p.communicate()
+        passed = not p.returncode
+        if err: return False, err
+        return passed, out
 
     def create_result_folder(self, user, exercise):
         res_dest_folder = join(settings.USER_DATA_ROOT, str(exercise.Folder_path), 'RESULTS')

@@ -50,8 +50,27 @@
                 <ul class="list-group">
                     {% for exercise in exercises  %}
                         {% if exercise.Assignment == assignment %}
-                            <li class="list-group-item clearfix">{{exercise.Description}} 
-                                <a href="{% url 'courses:download-user-file' %}?ex_id={{exercise.id}}" type="button" class="btn btn-sm btn-primary pull-right">Download</a>     
+                            <li class="list-group-item clearfix">
+                                <div class="col-xs-6">
+                                    <h4 class="list-group-item-heading ">{{exercise.Description}}</h4>    
+                                    {% for result in results  %}
+                                        {% if result.Exercise == exercise %}
+                                            <p class="list-group-item-text" style="margin-left:10px"> Last submit on: {{ result.Creation_date|date:"D d M Y" }} {{ result.Creation_date|time:"H:i" }} 
+                                            {% if result.Pass %}
+                                                , Status: <span class="label label-success">Passed</span>
+                                            {% else %}    
+                                                , Status: <span class="label label-warning">Not Passed</span>
+                                            {% endif %}
+                                                <a href="{% url 'courses:result-list' %}"> ( Show details ) </a>
+                                            </p>                      
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                </div>
+                                <div class="col-xs-6">
+                                    <a href="{% url 'courses:download-user-file' %}?ex_id={{exercise.id}}" type="button" class="btn btn-sm btn-primary pull-right">
+                                    Download Instructions</a>
+                                </div>             
                             </li>
                             
 

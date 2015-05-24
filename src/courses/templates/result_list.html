@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load add_get_parameter %} 
+
+{% block title %}{% with 'Submit history' as subtitle  %}
+{{ block.super }}
+{% endwith %}{% endblock %}
+
+{% block navbar-left %}
+{% include "_navbar.html" with active_link="Submit" %}
+{% endblock %}
+
+{% block splash %}
+{% endblock splash %}
+
+{% block container %}
+
+<div class="list-group">
+{% for result in results  %}
+  <li class="list-group-item">
+    <h4 class="list-group-item-heading">{{result}}</h4>
+    <p class="list-group-item-text" style="margin-left:10px"> Submitted on: {{ result.Creation_date|date:"D d M Y" }} {{ result.Creation_date|time:"H:i" }} 
+    {% if result.Pass %}
+        , Status: <span class="label label-success">Passed</span>
+    {% else %}    
+        , Status: <span class="label label-warning">Not Passed</span>
+    {% endif %}
+    </p>  
+    <p class="list-group-item-text">{{result.Parser_output}}</p>
+  </li>
+{% endfor %}
+</div>    
+
+{% endblock container %}
+
+
+
+{% block scripts %}
+<script src="{% static 'site/js/site.js' %}"></script>
+
+<script type="text/javascript">
+</script>    
+
+
+{% endblock scripts %}

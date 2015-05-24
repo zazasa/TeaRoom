@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-18 17:34:56
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-24 14:50:13
+# @Last Modified time: 2015-05-24 20:24:21
 
 # add external folder to import path
 if __name__ == '__main__' and __package__ is None:
@@ -21,7 +21,6 @@ class Planet(object):
         self.radius = radius
         self.velocity = velocity
 
-
 PLANETS = [
     Planet('Mercury', 3.3 * (10 ** 23), 2440, 4435),
     Planet('Hearth', 6.0 * (10 ** 24), 6378, 11200),
@@ -33,6 +32,8 @@ for planet in PLANETS:
         v = escape_velocity(planet.mass, planet.radius)
         err = abs(1 - v / planet.velocity)
         assert err < 0.05
-        print 'Nice job.'
     except:
         print 'Fails to calculate for planet: %s, result: %s' % (planet.name, v)
+        sys.exit(0)
+
+print 'Nice job.'

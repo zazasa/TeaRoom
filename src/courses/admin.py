@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-11 16:35:37
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-21 19:35:31
+# @Last Modified time: 2015-05-24 21:30:24
 
 from django.contrib import admin
 # Register your models here.
@@ -55,7 +55,7 @@ class ExerciseAdmin(admin.ModelAdmin):
         Exercise View for Course
     '''
 
-    list_display = ('Number', 'Description', 'Assignment', 'file_to_complete_list', 'file_to_test_list')
+    list_display = ('Number', 'Description', 'Assignment', 'file_to_complete_list', 'file_to_test_list', 'parser_list')
     readonly_fields = ('Folder_path',)
 
     list_filter = []
@@ -77,6 +77,14 @@ class ExerciseAdmin(admin.ModelAdmin):
             filelist.append(item.Name)
         return ','.join(filelist)
     file_to_test_list.short_description = 'To Test'
+
+    def parser_list(self, obj):
+        dataSet = UserFile.objects.filter(Exercise=obj, Type='parser')
+        filelist = []
+        for item in dataSet:
+            filelist.append(item.Name)
+        return ','.join(filelist)
+    parser_list.short_description = 'Parser'
 
 
 class AssignedAdmin(admin.ModelAdmin):
@@ -105,10 +113,19 @@ class UserFileAdmin(admin.ModelAdmin):
         super(UserFileAdmin, self).__init__(*args, **kwargs)
         self.list_display_links = (None, )
 
+
+class ResultAdmin(admin.ModelAdmin):
+    '''
+        Admin View for Result
+    '''
+    list_display = ('User', 'Exercise', 'Creation_date', 'Pass')
+    readonly_fields = ('User', 'Exercise', 'Pass', 'Creation_date', 'Parser_output')
+        
+
 admin.site.register(Enrolled, EnrolledAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Exercise, ExerciseAdmin)
-admin.site.register(Result)
+admin.site.register(Result, ResultAdmin)
 admin.site.register(UserFile, UserFileAdmin)
 admin.site.register(Assigned, AssignedAdmin)

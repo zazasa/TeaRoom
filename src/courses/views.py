@@ -100,6 +100,16 @@ class AssignmentListView(LoginRequiredMixin, ListView):
         courses_list = Course.objects.filter(Students=self.request.user)
         return courses_list
 
+    def _get_result_list(self, ex_list):
+        result_list = []
+        for e in ex_list:
+            res_set = e.result_set.filter(Pass=True).order_by('-Creation_date')
+            if not res_set:
+                res_set = e.result_set.filter(Pass=False).order_by('-Creation_date')
+            if res_set:
+                result_list.append(res_set[0])
+        return result_list
+
     def get_context_data(self, **kwargs):
         context = super(AssignmentListView, self).get_context_data(**kwargs)
         courses_list = context['courses']
@@ -114,8 +124,11 @@ class AssignmentListView(LoginRequiredMixin, ListView):
                 selected_course = courses_list[0]
             assignment_list = Assignment.objects.filter(Course=selected_course)
             exercise_list = self.request.user.exercise_set.all()
+            result_list = self._get_result_list(exercise_list)
             context['assignments'] = assignment_list
             context['exercises'] = exercise_list
+            print 'xxx', result_list
+            context['results'] = result_list
             context['selected_course'] = selected_course
 
         return context
@@ -137,3 +150,8 @@ class DownloadUserFileView(LoginRequiredMixin, View):
         except:
             return HttpResponseNotFound('Bad exercise package configuration. Please contact admins.')
         
+
+class ResultListView(ListView):
+    model = Result
+    template_name = "result_list.html"
+    context_object_name = 'results'

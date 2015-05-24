@@ -183,6 +183,8 @@ class Exercise(models.Model):
                 folder_path = join(self.Folder_path, 'user_files')
             elif ftype == 'to_test':
                 folder_path = join(self.Folder_path, 'test_files')
+            elif ftype == 'parser':
+                folder_path = join(self.Folder_path, 'test_files')
             else:
                 raise ValidationError('bad file type')
             f.Folder_path = folder_path
@@ -226,9 +228,10 @@ class Result(models.Model):
     Exercise = models.ForeignKey(Exercise, null=True)
 
     User = models.ForeignKey(User, limit_choices_to={'is_staff': False})
-    Creation_date = models.DateField(editable=False, auto_now_add=True)
-    Update_date = models.DateField(editable=False, blank=True)
+
+    Creation_date = models.DateTimeField(editable=False, auto_now_add=True)
     Pass = models.BooleanField(default=False)
+    Parser_output = models.TextField(editable=False, default='')
 
     class Meta:
         verbose_name = "Result"
@@ -244,7 +247,7 @@ class UserFile(models.Model):
 
     Name = models.CharField('Filename', max_length=50)
     Folder_path = models.CharField('Folder_path', max_length=200, null=True, blank=True)
-    Type = models.CharField('Type', max_length=50)  # to_complete or to_test
+    Type = models.CharField('Type', max_length=50)  # to_complete or to_test or parser
 
     class Meta:
         verbose_name = "UserFile"
