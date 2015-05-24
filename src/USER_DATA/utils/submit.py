@@ -47,7 +47,11 @@ def create_package(file_list, out):
 
 def upload_package(auth_data, filename):
     s = requests.session()
+
+    # get csrftoken from server
     r = s.get(URL, verify=False)
+    csrftoken = r.cookies['csrftoken']
+    headers = {'X-CSRFToken': csrftoken, 'Referer': URL}
 
     files = {'file': open(filename, 'rb')}
 
@@ -55,9 +59,6 @@ def upload_package(auth_data, filename):
     data['ex_id'] = EXERCISE_ID
     data['submit_key'] = SUBMIT_KEY
     data['type'] = 'upload'
-
-    csrftoken = r.cookies['csrftoken']
-    headers = {'X-CSRFToken': csrftoken, 'Referer': URL}
 
     r = requests.post(URL, data=data, headers=headers, cookies=r.cookies, files=files)
 
@@ -68,20 +69,30 @@ def upload_package(auth_data, filename):
 def download_and_execute_test(auth_data):
     s = requests.session()
     global r
+
+    # get csrftoken from server
     r = s.get(URL, verify=False)
-    data = auth_data
-    data['ex_id'] = EXERCISE_ID
-    data['submit_key'] = SUBMIT_KEY
-    data['type'] = 'download'
-    
     csrftoken = r.cookies['csrftoken']
     headers = {'X-CSRFToken': csrftoken, 'Referer': URL}
 
+    data = auth_data
+    data['ex_id'] = EXERCISE_ID
+    data['submit_key'] = SUBMIT_KEY  # unknown to user
+    data['type'] = 'download'  # download tests
+    
+    # post request to server
     r = requests.post(URL, data=data, headers=headers, cookies=r.cookies)
+    # get either compiled python or other info (e.g. auth errors)
     if r.headers['content-type'] == 'application/x-bytecode.python':
+        # open a python subprocess with dedicated stdin/out/err
         p = Popen(['python'], stdout=PIPE, stdin=PIPE, stderr=PIPE)
+        # put the pyc in the stdin of the subprocess (exec test)
         out, err = p.communicate(r.text)
         if err:
+            # Error on the client's side:
+            # e.g. exception in the test of a user defined function
+            # or syntax errors, etc etc.
+            # Print error messages in user's terminal
             print err
             return False
         else:
@@ -95,8 +106,11 @@ if __name__ == '__main__':
     auth_data = get_user_and_pass()
     
     out = download_and_execute_test(auth_data)
+
+    # pack and upload test output
     if out:
         create_package(FILES_TO_COMPLETE, out)
         upload_package(auth_data, OUTPUT_FILENAME)
+        # remove test output from user's disk
         remove(OUTPUT_FILENAME)
 
