@@ -1,0 +1,34 @@
+How to deploy our Django project
+================================
+
+Requirements:
+-------------
+
+An Apache server with the wsgi module.
+A folder where to put the site source.
+Access to Apache, to mySQL, and to the file system.
+
+Useful links:
+-------------
+
+1. http://www.djangobook.com/en/2.0/chapter12.html
+2. https://docs.djangoproject.com/en/dev/ref/settings/#databases
+3. https://github.com/joke2k/django-environ  # search for "db_url"
+4. https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/modwsgi/.
+
+TODOs:
+------
+
+- Settings for production mode to be stored in TeaRoom/src/TeaRoom/settings/production.py and local.env
+- syntax for database url in local.env: check link n. 3
+- set EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # and other info at https://docs.djangoproject.com/en/1.8/topics/email/#smtp-backend
+- remove development.py
+Do one of the following (I think the second):
+- before running, do what written in settings.__init__, i.e.:
+    export DJANGO_SETTINGS_MODULE=TeaRoom.settings.production
+- In TeaRoom/src/TeaRoom/wsgi.py at line 11, change TeaRoom.settings to TeaRoom.settings.production
+- remove development.py and import production.py instead (from settings.__init__.py)
+Then:
+- check if templates 404 and 500 exist / work; if not, create them.
+- AoB????
+
