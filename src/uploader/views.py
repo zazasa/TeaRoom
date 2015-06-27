@@ -15,7 +15,7 @@ import sys
 import pickle
 from courses.models import Course, Assignment, Exercise, UserFile, Result
 from py_compile import compile
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from datetime import datetime
 import binascii
 from django.http import HttpResponse, HttpResponseNotFound
@@ -98,8 +98,10 @@ class UploadAssignmentView(TemplateView):
         for ex_setting in ex_settings:
             ordinal_number = ex_setting['ORDINAL_NUMBER']
             try:
+                # Update pre-existing exercise
                 e = Exercise.objects.get(Assignment=a, Number=ordinal_number)
             except:
+                # Exercise does not exist: create it
                 e = Exercise(Assignment=a, Description=ex_setting['SHORT_DESCRIPTION'], Number=ordinal_number)
             e.Description = ex_setting['SHORT_DESCRIPTION']
             e.Points = ex_setting['POINTS']
@@ -109,9 +111,19 @@ class UploadAssignmentView(TemplateView):
             dest_user_files = join(settings.USER_DATA_ROOT, exercise_folder, 'user_files')
             dest_test_files = join(settings.USER_DATA_ROOT, exercise_folder, 'test_files')
 
+            # Remove files from disk
+            old_package = None
+            try:
+                old_package = UserFile.objects.get(Exercise=e, Type='package')
+                remove( join(settings.USER_DATA_ROOT, str(old_package)) )
+            except MultipleObjectsReturned as exc:
+                raise Exception(exc)
+            except:
+                pass
+
             if isdir(dest_user_files): rmtree(dest_user_files)
             if isdir(dest_test_files): rmtree(dest_test_files)
-            e.remove_all_files()
+            e.remove_all_files()  # Remove all files form the database
 
             copytree(join(temp_folder, ex_setting['RELATIVE_FOLDER'], 'user_files'), dest_user_files)
             copytree(join(temp_folder, ex_setting['RELATIVE_FOLDER'], 'test_files'), dest_test_files)
@@ -125,7 +137,8 @@ class UploadAssignmentView(TemplateView):
             for filename in ex_setting['FILES_TO_COMPLETE']: e.update_file(filename, 'to_complete')
 
             self.build_submit_script(e, dest_user_files)
-            self.create_user_package(dest_user_files, exercise_folder)
+            package_name = a.Title.replace(' ', '_') + '.tar.gz'
+            self.create_user_package(e, dest_user_files, exercise_folder, package_name)
 
     def build_submit_script(self, e, dest_user_files):
         file_list = [item.Name for item in e.userfile_set.filter(Type='to_complete')]
@@ -140,14 +153,19 @@ class UploadAssignmentView(TemplateView):
         compile(destination_file, doraise=True)
         remove(destination_file)
 
-    def create_user_package(self, dest_user_files, ex_folder):
-        package_file = join(settings.USER_DATA_ROOT, ex_folder, 'ex_package.tar.gz')
-        make_tarfile(package_file, dest_user_files)
+    def create_user_package(self, e, dest_user_files, ex_folder, package_name):
+        # Save to disk
+        package_file = join(settings.USER_DATA_ROOT, ex_folder, package_name)
+        make_tarfile(package_file, dest_user_files, package_name.replace('.tar.gz', ''))
+        # Write into the database
+        uf = UserFile(Exercise=e, Name=package_name, Folder_path=ex_folder, Type='package')
+        uf.save()
 
 
-def make_tarfile(output_filename, source_dir):
+def make_tarfile(output_filename, source_dir, folder_name):
     with tarfile.open(output_filename, "w:gz") as tar:
-        tar.add(source_dir, arcname=path.basename(source_dir))
+        #tar.add(source_dir, arcname=path.basename(source_dir))
+        tar.add(source_dir, arcname=folder_name)
 
 
 def save_uploaded_file(f, filepath):
