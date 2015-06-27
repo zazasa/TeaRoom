@@ -133,7 +133,7 @@ class AssignmentListView(LoginRequiredMixin, ListView):
 
         return context
 
-    
+
 class DownloadUserFileView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         try:
@@ -153,9 +153,12 @@ class DownloadUserFileView(LoginRequiredMixin, View):
         except:
             #return HttpResponseNotFound(filepath)
             return HttpResponseNotFound('Exercise package not found. Please contact the admins.')
-        
 
-class ResultListView(ListView):
-    model = Result
+
+class ResultListView(LoginRequiredMixin, ListView):
     template_name = "result_list.html"
     context_object_name = 'results'
+
+    def get_queryset(self):
+        courses_list = Result.objects.order_by('-Creation_date').filter(User=self.request.user)
+        return courses_list
