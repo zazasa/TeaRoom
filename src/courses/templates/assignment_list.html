@@ -4,6 +4,8 @@
 {% load crispy_forms_tags %}
 {% load add_get_parameter %} 
 
+{% load with_user %}
+
 {% block title %}{% with 'Assignments' as subtitle  %}
 {{ block.super }}
 {% endwith %}{% endblock %}
@@ -48,36 +50,38 @@
             <div class="panel panel-primary">                  
               <div class="panel-body">
                 <ul class="list-group">
-                    {% for exercise in exercises  %}
-                        {% if exercise.Assignment == assignment %}
-                            <li class="list-group-item clearfix">
-                                <div class="col-xs-6">
-                                    <h4 class="list-group-item-heading ">{{exercise.Description}}</h4>    
-                                    {% for result in results  %}
-                                        {% if result.Exercise == exercise %}
-                                            <p class="list-group-item-text" style="margin-left:10px"> Last submit on: {{ result.Creation_date|date:"D d M Y" }} {{ result.Creation_date|time:"H:i" }} 
-                                            {% if result.Pass %}
-                                                , Status: <span class="label label-success">Passed</span>
-                                            {% else %}    
-                                                , Status: <span class="label label-warning">Not Passed</span>
+                    {% with assignment.exercise_set.all as exercise_set %}
+                        {% for exercise in exercise_set|with_user:user %}
+                            {% if exercise.Assignment == assignment %}
+                                <li class="list-group-item clearfix">
+                                    <div class="col-xs-6">
+                                        <h4 class="list-group-item-heading ">{{exercise.Description}}</h4>    
+                                        {% for result in results  %}
+                                            {% if result.Exercise == exercise %}
+                                                <p class="list-group-item-text" style="margin-left:10px"> Last submit on: {{ result.Creation_date|date:"D d M Y" }} {{ result.Creation_date|time:"H:i" }} 
+                                                {% if result.Pass %}
+                                                    , Status: <span class="label label-success">Passed</span>
+                                                {% else %}    
+                                                    , Status: <span class="label label-warning">Not Passed</span>
+                                                {% endif %}
+                                                    <a href="{% url 'courses:result-list' %}"> ( Show details ) </a>
+                                                </p>                      
                                             {% endif %}
-                                                <a href="{% url 'courses:result-list' %}"> ( Show details ) </a>
-                                            </p>                      
-                                        {% endif %}
-                                    {% endfor %}
+                                        {% endfor %}
                                     
-                                </div>
-                                <div class="col-xs-6">
-                                    <a href="{% url 'courses:download-user-file' %}?ex_id={{exercise.id}}" type="button" class="btn btn-sm btn-primary pull-right">
-                                    Download exercise</a>
-                                </div>             
-                            </li>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <a href="{% url 'courses:download-user-file' %}?ex_id={{exercise.id}}" type="button" class="btn btn-sm btn-primary pull-right">
+                                        Download exercise</a>
+                                    </div>             
+                                </li>
                             
 
-                        {% endif %}
-                    {% empty %}
-                        <p> There are no exercises assigned. </p>
-                    {% endfor %}                    
+                            {% endif %}
+                        {% empty %}
+                            <p> There are no exercises assigned to you for this session. If this is unexpected, please contact the admins.</p>
+                        {% endfor %}                    
+                    {% endwith %}
                 </ul>
             </div>
         </div>
