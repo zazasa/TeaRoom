@@ -247,7 +247,7 @@ class UserFile(models.Model):
 
     Name = models.CharField('Filename', max_length=50)
     Folder_path = models.CharField('Folder_path', max_length=200, null=True, blank=True)
-    Type = models.CharField('Type', max_length=50)  # to_complete or to_test or parser
+    Type = models.CharField('Type', max_length=50)  # to_complete, to_test, package or parser
 
     class Meta:
         verbose_name = "UserFile"

@@ -140,15 +140,19 @@ class DownloadUserFileView(LoginRequiredMixin, View):
             ex_id = request.GET.get('ex_id') or False
             e = Exercise.objects.get(id=ex_id)
 
-            filename = 'ex_package.tar.gz'
-            filepath = join(settings.USER_DATA_ROOT, str(e.Folder_path), filename)
+            #filename = 'ex_package.tar.gz'
+            #filepath = join(settings.USER_DATA_ROOT, str(e.Folder_path), filename)
+            package = UserFile.objects.get(Exercise=e, Type='package')
+            filename = package.Name
+            filepath = join(settings.USER_DATA_ROOT, package.Folder_path, filename)
 
             # You got the zip! Now, return it!
             response = HttpResponse(open(filepath, 'rb'), content_type='application/x-gtar')
             response['Content-Disposition'] = 'attachment; filename=%s' % filename
             return response
         except:
-            return HttpResponseNotFound('Bad exercise package configuration. Please contact admins.')
+            #return HttpResponseNotFound(filepath)
+            return HttpResponseNotFound('Exercise package not found. Please contact the admins.')
         
 
 class ResultListView(ListView):
