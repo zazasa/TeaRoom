@@ -63,7 +63,7 @@
                     <form action="" method="POST" role="form">
                         {% csrf_token %}
                         <input type="hidden" name ='enroll_id' value="{{course.id}}">
-                        <button type='submit' class="enroll-btn btn btn-xs btn-primary pull-right"><span>Enroll now</span></button>
+                        <button type='submit' class="enroll-btn btn btn-xs btn-primary pull-right" course-name="{{course.Name}}"><span>Enroll now</span></button>
                     </form>    
                     
                     {% else %}    
@@ -98,10 +98,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Confirm your enrollment</h4>
+                <h4 class="modal-title">Please confirm your enrollment</h4>
             </div>
             <div class="modal-body">
-                Are you sure?
+                You are about to enroll to <span id="course_name"></span>. Are you sure?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
@@ -129,6 +129,8 @@
     $('.enroll-btn').on('click', function(e){
         var $form=$(this).closest('form');
         e.preventDefault();
+        var course_name = $(e.currentTarget).attr("course-name");
+        $('#confirm-enroll').find('#course_name').text(course_name);
         $('#confirm-enroll').modal()
             .find('#confirm')
             .one('click', function (e) {
