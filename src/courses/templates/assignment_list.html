@@ -69,7 +69,7 @@
                                 </div>
                                 <div class="col-xs-6">
                                     <a href="{% url 'courses:download-user-file' %}?ex_id={{exercise.id}}" type="button" class="btn btn-sm btn-primary pull-right">
-                                    Download Instructions</a>
+                                    Download assignment</a>
                                 </div>             
                             </li>
                             
@@ -85,7 +85,7 @@
     </div>
     <br>
     {% empty %}
-    <p class="list-group-item list-group-item-text list-group-item-warning"> There's no assignments for this course.</p>
+    <p class="list-group-item list-group-item-text list-group-item-warning"> There are no assignments for this course.</p>
     {% endfor %}
 
 {% endblock container %}
