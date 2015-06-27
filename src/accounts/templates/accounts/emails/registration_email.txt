@@ -1,7 +1,7 @@
 {% load i18n %}{% autoescape off %}
 {% blocktrans %}Dear {{ user }},{% endblocktrans %}
-{% trans 'Your account registration was created successfully.' %}
+{% trans 'Your account registration was successful.' %}
 
-{% trans 'Please wait until the inspector verify your registration.' %}
-{% trans 'You will receive an acceptance or rejection email within several days.' %}
+{% trans 'Please wait until the admins verify your registration.' %}
+{% trans 'You will receive an acceptance or rejection email within a few days.' %}
 {% endautoescape %}
