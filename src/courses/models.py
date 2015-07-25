@@ -147,6 +147,7 @@ class Exercise(models.Model):
     Folder_path = models.CharField('Folder_path', max_length=200, null=True, blank=True, editable=False)
     Students = models.ManyToManyField(User, through='Assigned')
     Submit_key = models.CharField('Submit key', max_length=25, editable=False)
+    Group = models.CharField('Group', max_length=50, default='None')
 
     class Meta:
         verbose_name = "Exercise"
