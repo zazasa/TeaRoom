@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load add_get_parameter %} 
+
+{% block title %}{% with 'Courses' as subtitle  %}
+{{ block.super }}
+{% endwith %}{% endblock %}
+
+{% block navbar-left %}
+{% include "_navbar.html" with active_link="Courses" %}
+{% endblock %}
+
+{% block splash %}
+{% endblock splash %}
+
+{% block container %}
+
+
+<div class="">
+
+    <a class="navbar-brand">Courses</a>
+    <ul class="nav nav-tabs">    
+        {% if  show_closed %}
+        <a href="{% add_get show_closed=False %}" type="button" class="navbar-btn btn btn-sm btn-info pull-right" style="margin-bottom:0">
+            <span><i class="glyphicon glyphicon-check"></i> Hide Closed</span>
+        </a>
+        {% else %}    
+        <a href="{% add_get show_closed=True %}" type="button" class="navbar-btn btn btn-sm btn-default pull-right" style="margin-bottom:0">
+            <span><i class="glyphicon glyphicon-unchecked"></i> Show Closed</span>
+        </a>
+        {% endif %}
+    </ul>
+    <div class="list-group">
+        <br>
+        {% for course in courses %}
+        <div class="list-group-item list-group-item-info toggle clearfix" id="dropdown-detail-{{ course.id }}" data-toggle="detail-{{ course.id }}" style="cursor: pointer; cursor: hand;">
+            <div class="col-xs-6">
+                <h4 class="list-group-item-heading ">{{ course }}
+                    {% if course.Is_ongoing%}<span class="label label-info">Ongoing</span>
+                    {% else %}<span class="label label-warning">Closed</span> {% endif %}
+                </h4> 
+                <p class="list-group-item-text"> Started on {{course.Start_date}}</p>
+            </div>
+            
+            <div class="col-xs-6">
+                <span class='list-group-item-text pull-right'>
+                
+                    {% if  course.Is_enrollment_open and course.Is_ongoing%}
+                    <p class="list-group-item-text">
+                        <div class='label label-primary'>
+                            {% if  course.Is_always_open%}
+                            Enrollment always open
+                            {% else %}                                        
+                            Enroll till {{course.Enrollment_due_date}}                         
+                            {% endif %}
+                        </div>                        
+                    </p>
+                    {% else %}    
+                    <p class="list-group-item-text">
+                        <div class='label label-default'>Enrollment closed on {{course.Enrollment_due_date}}</div>
+                    </p>
+                    {% endif %}
+   
+                    <a class="btn btn-primary pull-right" href='{% url 'courses:assignment-list-staff' %}?selected_course_id={{course.id}}' ><span>Go to Assignments</span></a>
+                
+                </span>
+            </div>      
+        </div>
+
+        <div id="detail-{{ course.id }}" style="display:none">
+            <div class="panel panel-primary">                  
+              <div class="panel-body">
+                <p>{{ course.Description }}</p>
+            </div>
+        </div>
+
+    </div>
+    <br>
+    {% empty %}
+    <p class="list-group-item list-group-item-text list-group-item-warning"> No Courses available. </p>
+    {% endfor %}
+</ul>
+</div>
+
+<div class="modal fade" id="confirm-enroll">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Please confirm your enrollment</h4>
+            </div>
+            <div class="modal-body">
+                You are about to enroll to <span id="course_name"></span>. Are you sure?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-primary" id='confirm'>Yes</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+{% endblock container %}
+
+
+
+{% block scripts %}
+<script src="{% static 'site/js/site.js' %}"></script>
+
+<script type="text/javascript">
+
+    // Prevent execution of parent event handler for buttons
+    $(".enroll-btn").click(function(e) {
+          e.stopPropagation();
+    });
+
+    $('.enroll-btn').on('click', function(e){
+        var $form=$(this).closest('form');
+        e.preventDefault();
+        var course_name = $(e.currentTarget).attr("course-name");
+        $('#confirm-enroll').find('#course_name').text(course_name);
+        $('#confirm-enroll').modal()
+            .find('#confirm')
+            .one('click', function (e) {
+                $form.trigger('submit');
+            });
+    });
+</script>    
+
+
+{% endblock scripts %}

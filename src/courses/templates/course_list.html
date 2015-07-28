@@ -26,7 +26,7 @@
         <li class="{% if show_other %} active {% endif %}"><a href="{% add_get show_other=True %}">Others</a></li>                
         {% if  show_closed %}
         <a href="{% add_get show_closed=False %}" type="button" class="navbar-btn btn btn-sm btn-info pull-right" style="margin-bottom:0">
-            <span><i class="glyphicon glyphicon-check"></i> Show Closed</span>
+            <span><i class="glyphicon glyphicon-check"></i> Hide Closed</span>
         </a>
         {% else %}    
         <a href="{% add_get show_closed=True %}" type="button" class="navbar-btn btn btn-sm btn-default pull-right" style="margin-bottom:0">

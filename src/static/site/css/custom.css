@@ -1,0 +1,72 @@
+/* 
+* @Author: salvo
+* @Date:   2015-05-15 14:49:59
+* @Last Modified by:   salvo
+* @Last Modified time: 2015-07-28 20:04:00
+*/
+
+.navbar-brand .badge {
+    position: relative;
+    top: -10px;
+    left: -10px;
+}
+
+
+
+fieldset.exgroup-border {
+    border: 1px groove #bce8f1 !important;
+    padding: 0 1.4em 1.4em 1.4em !important;
+    margin: 0 0 1.5em 0 !important;
+    -webkit-box-shadow:  0px 0px 0px 0px #000;
+            box-shadow:  0px 0px 0px 0px #000;
+}
+
+    legend.exgroup-border {
+        font-size: 1.2em !important;
+        font-weight: bold !important;
+        text-align: left !important;
+        width:auto;
+        padding:0 10px;
+        border-bottom:none;
+    }
+
+
+/* Student selector panel */
+.state-icon {
+    left: -5px;
+}
+.list-group-item-primary {
+    color: rgb(255, 255, 255);
+    background-color: rgb(66, 139, 202);
+}
+
+/* DEMO ONLY - REMOVES UNWANTED MARGIN */
+.well .list-group {
+    margin-bottom: 0px;
+}
+
+
+/* exercise student table filters */
+.filterable {
+    margin-top: 0px;
+}
+.filterable .panel-heading .pull-right {
+    margin-top: -20px;
+}
+.filterable .filters input[disabled] {
+    background-color: transparent;
+    border: none;
+    cursor: auto;
+    box-shadow: none;
+    padding: 0;
+    height: auto;
+}
+.filterable .filters input[disabled]::-webkit-input-placeholder {
+    color: #333;
+}
+.filterable .filters input[disabled]::-moz-placeholder {
+    color: #333;
+}
+.filterable .filters input[disabled]:-ms-input-placeholder {
+    color: #333;
+}

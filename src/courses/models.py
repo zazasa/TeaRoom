@@ -10,6 +10,9 @@ from os import makedirs
 from django.conf import settings
 import random, string
 
+from utils import QuerySet
+
+
 class CourseManager(models.Manager):
     def filter_ongoing(self):
         return super(CourseManager, self).filter(End_date__gte=date.today())
@@ -224,8 +227,18 @@ class Assigned(models.Model):
         super(Assigned, self).save(*args, **kwargs)
 
 
-class Result(models.Model):
+class ResultQuerySet(models.QuerySet):
+    def last_result(self):
+        r = self.filter(Pass=True).order_by('-Creation_date')
+        if not r:
+            r = self.filter(Pass=False).order_by('-Creation_date')
+        if r:
+            return r[0]
+        else:
+            return False
 
+
+class Result(models.Model):
     Exercise = models.ForeignKey(Exercise, null=True)
 
     User = models.ForeignKey(User, limit_choices_to={'is_staff': False})
@@ -233,6 +246,8 @@ class Result(models.Model):
     Creation_date = models.DateTimeField(editable=False, auto_now_add=True)
     Pass = models.BooleanField(default=False)
     Parser_output = models.TextField(editable=False, default='')
+    
+    objects = ResultQuerySet.as_manager()  # Custom queryset method
 
     class Meta:
         verbose_name = "Result"
@@ -257,4 +272,8 @@ class UserFile(models.Model):
 
     def __str__(self):
         return "%s" % join(self.Folder_path, self.Name)
+
+
+
+
     
