@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-11 17:31:12
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-07-27 10:55:57
+# @Last Modified time: 2015-07-29 18:40:26
 
 from django.conf.urls import patterns, url
 
@@ -16,4 +16,6 @@ urlpatterns = patterns('',
                        url(r'^assignment-list-staff/$', views.AssignmentListStaffView.as_view(), name="assignment-list-staff"),
                        url(r'^download-user-file/$', views.DownloadUserFileView.as_view(), name="download-user-file"),
                        url(r'^result-list/$', views.ResultListView.as_view(), name="result-list"),
+                       url(r'^result-list-staff/$', views.ResultListStaffView.as_view(), name="result-list-staff"),
+                       url(r'^single-result/$', views.SingleResultView.as_view(), name="single-result"),
                        )

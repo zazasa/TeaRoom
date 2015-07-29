@@ -4,7 +4,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic.edit import ProcessFormView
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, TemplateView, View
-from braces.views import LoginRequiredMixin, CsrfExemptMixin
+from braces.views import LoginRequiredMixin, CsrfExemptMixin, StaffuserRequiredMixin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.conf import settings
@@ -18,7 +18,8 @@ from django.http import Http404
 import json
 import traceback
 
-class CourseListStaffView(LoginRequiredMixin, ListView):
+
+class CourseListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListView):
     model = Course
     template_name = "course_list_staff.html"
     context_object_name = 'courses'
@@ -118,7 +119,7 @@ class CourseListView(LoginRequiredMixin, ListView):
         return mycourses
 
 
-class AssignmentListStaffView(LoginRequiredMixin, ListView):
+class AssignmentListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListView):
     
     template_name = "assignment_list_staff.html"
     context_object_name = 'courses'
@@ -140,10 +141,8 @@ class AssignmentListStaffView(LoginRequiredMixin, ListView):
             else:
                 selected_course = courses_list[0]
             assignment_list = Assignment.objects.filter(Course=selected_course)
-            exercise_list = self.request.user.exercise_set.all()
 
             context['assignments'] = assignment_list
-            context['exercises'] = exercise_list
             context['selected_course'] = selected_course
 
         return context
@@ -156,9 +155,9 @@ class AssignmentListStaffView(LoginRequiredMixin, ListView):
                 result_queryset = student.result_set.filter(Exercise=exercise)
                 result = result_queryset.last_result()
                 if result:
-                    student_list.append({"student_id": str(student.id), "student": str(student.name), "result": str(result.Pass), "date": str(result.Creation_date.strftime('%B %d, %H:%M'))})
+                    student_list.append({"result_id": result.id, "student_id": str(student.id), "student": str(student.name), "result": str(result.Pass), "date": str(result.Creation_date.strftime('%B %d, %H:%M'))})
                 else:
-                    student_list.append({"student_id": str(student.id), "student": str(student.name), "result": 'N/A', "date": 'N/A'})
+                    student_list.append({"result_id": 'false', "student_id": str(student.id), "student": str(student.name), "result": 'N/A', "date": 'N/A'})
             exercise_list.append({"exercise_id": str(exercise.id), "student_list": student_list})
         return exercise_list
 
@@ -189,8 +188,6 @@ class AssignmentListStaffView(LoginRequiredMixin, ListView):
         print action, exercise_id, students_id, student_id
 
         try:
-            if not user.is_staff:
-                raise Exception('Not staff user')
             if action == 'add':
                 if exercise_id and students_id:
                     exercise_id = int(exercise_id)
@@ -212,10 +209,7 @@ class AssignmentListStaffView(LoginRequiredMixin, ListView):
             response_data['error'] = str(traceback.format_exc())
             
         print json.dumps(response_data)
-        return HttpResponse(
-            json.dumps(response_data),
-            content_type="application/json"
-        )
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
     
     
 class AssignmentListView(LoginRequiredMixin, ListView):
@@ -277,8 +271,36 @@ class DownloadUserFileView(LoginRequiredMixin, View):
             response['Content-Disposition'] = 'attachment; filename=%s' % filename
             return response
         except:
-            #return HttpResponseNotFound(filepath)
+            # return HttpResponseNotFound(filepath)
             return HttpResponseNotFound('Exercise package not found. Please contact the admins.')
+
+
+class ResultListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListView):
+    model = Course
+    template_name = "result_list_staff.html"
+    context_object_name = 'courses'
+    
+    def get_queryset(self):
+        courses_list = Course.objects.all()
+        return courses_list
+
+    def get_context_data(self, **kwargs):
+        context = super(ResultListStaffView, self).get_context_data(**kwargs)
+        courses_list = context['courses']
+        if courses_list:
+            selected_course_id = self.request.GET.get('selected_course_id') or False
+            if selected_course_id:
+                try:
+                    selected_course = courses_list.get(id=selected_course_id)
+                except:
+                    selected_course = courses_list[0]
+            else:
+                selected_course = courses_list[0]
+
+            context['exercise_list'] = Exercise.objects.filter(Assignment__Course=selected_course)
+            context['selected_course'] = selected_course
+
+        return context
 
 
 class ResultListView(LoginRequiredMixin, ListView):
@@ -298,3 +320,20 @@ def last_result(result_queryset):
         return r[0]
     else:
         return False
+
+
+class SingleResultView(LoginRequiredMixin, TemplateView):
+    template_name = "single_result.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(SingleResultView, self).get_context_data(**kwargs)
+
+        result_id = self.request.GET.get('result_id') or False
+        if result_id:
+            res = Result.objects.get(id=result_id)
+            context['result_history'] = Result.objects.filter(Exercise=res.Exercise, User=res.User).exclude(id=result_id).order_by('-Creation_date')
+            context['result'] = res
+        else:
+            context['result'] = False
+        return context
+        

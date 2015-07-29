@@ -21,7 +21,7 @@
   <!-- Bootstrap core CSS -->
   <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   <link href="{% static 'bootstrap-select/dist/css/bootstrap-select.min.css' %}" rel="stylesheet">
-  {# <link href="{% static 'bootstrap-table/src/bootstrap-table.css' %}" rel="stylesheet"> #}
+  <link href="{% static 'bootstrap-table/dist/bootstrap-table.css' %}" rel="stylesheet">
   {# <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" rel="stylesheet"> #}
 
   <!-- Custom styles for this site -->
@@ -145,6 +145,10 @@
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="{% static 'jquery-cookie/jquery.cookie.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'tableExport/tableExport.js' %}"></script>
+    <script src="{% static 'bootstrap-table/dist/bootstrap-table-all.js' %}"></script>
+    <script src="{% static 'bootstrap-table/dist/extensions/export/bootstrap-table-export.js' %}"></script>
+
     <script src="{% static 'bootstrap-select/dist/js/bootstrap-select.min.js' %}"></script>
     <script src="{% static 'slideReveal/src/slidereveal.js' %}"></script>
     {% block scripts %}

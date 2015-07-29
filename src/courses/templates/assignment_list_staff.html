@@ -107,9 +107,14 @@
                                                                     data-toggle="tooltip" data-placement="top" 
                                                                     title="Remove from exercise" exercise-id='{{exercise.id}}' student-id='{{student.id}}'>
                                                                     <span class="glyphicon glyphicon-remove"></span></button>
-                                                                <button class="btn btn-xs btn-info" data-toggle="tooltip" data-placement="top" 
+                                                                {% if student.result_set|with_exercise:exercise %}
+                                                                {% with student.result_set|with_exercise:exercise as result  %}
+                                                                <a href='{% url 'courses:single-result' %}?result_id={{result.last_result.id}}'
+                                                                    class="btn btn-xs btn-info" data-toggle="tooltip" data-placement="top" 
                                                                     title="Show details">
-                                                                    <span class="glyphicon glyphicon-search"></span></button>
+                                                                    <span class="glyphicon glyphicon-search"></span></a>
+                                                                {% endwith %}
+                                                                {% endif %}
                                                             </td>
                                                         </tr>
                                                         
@@ -198,8 +203,11 @@
         trigger: $(".add-students-btn"),
     });
     $('#slider-panel').removeClass('hidden');
+    
+    var href = {% url 'courses:single-result' %};
 
     function update_exercise (exercise_list) {
+
         exercise_list.forEach(function(item){
             var content = '';
             console.log(item)
@@ -223,11 +231,15 @@
                             <button class="student-rem btn btn-xs btn-danger" \
                             data-toggle="tooltip" data-placement="top" \
                             title="Remove from exercise" exercise-id='+item.exercise_id+' student-id='+student.student_id+'> \
-                            <span class="glyphicon glyphicon-remove"></span></button> \
-                            <button class="btn btn-xs btn-info" data-toggle="tooltip" data-placement="top" \
+                            <span class="glyphicon glyphicon-remove"></span></button> '
+                if (student.result_id !='false'){
+                    content+='<a href="'+href+'?result_id='+student.result_id+'"}} \
+                            class="btn btn-xs btn-info" data-toggle="tooltip" data-placement="top" \
                             title="Show details"> \
-                            <span class="glyphicon glyphicon-search"></span></button> \
+                            <span class="glyphicon glyphicon-search"></span></a> \
                             </td> '
+                }
+                            
                 content+='</tr>';
             })
             ex_table.html(content)
