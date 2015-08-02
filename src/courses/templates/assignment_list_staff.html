@@ -41,9 +41,26 @@
     <div class="list-group">
       {% for assignment in assignments %}
         <div class="list-group-item list-group-item-info toggle clearfix" id="dropdown-detail-{{ assignment.id }}" data-toggle="detail-{{ assignment.id }}" style="cursor: pointer; cursor: hand;">
-        <h4 class="list-group-item-heading ">{{ assignment.Title }}
-        <button class="pull-right auto-shuffle-btn btn btn-sm btn-primary" assignment-id="{{assignment.id}}">
-        <span>Auto Shuffle</span></button></h4> 
+        <div class="col-xs-6">
+            <h4 class="list-group-item-heading ">{{ assignment.Title }} </h4>
+            <p class="list-group-item-text">
+                Status: 
+                {% if  assignment.is_active %}
+                    Active
+                {% else %}     
+                    will be activated in date {{assignment.Activation_date}}
+                {% endif %} 
+            </p>
+            <p class="list-group-item-text"> Hard Date: {{assignment.Hard_date|date:"F j, H:i"}}</p>
+            {% if  assignment.Hard_date != assignment.Due_date %}
+                <p class="list-group-item-text"> Due Date: {{assignment.Due_date|date:"F j, H:i"}}</p>    
+                <p class="list-group-item-text"> Penality Percent: {{assignment.Penality_percent}} %</p>    
+            {% endif %}
+        </div>
+        <div class="col-xs-6">
+            <button class="pull-right auto-shuffle-btn btn btn-sm btn-primary" assignment-id="{{assignment.id}}">
+            <span>Auto Shuffle</span></button> 
+        </div>
         </div>
         <div id="detail-{{ assignment.id }}" style="display:none">
             <div class="panel panel-primary">                  

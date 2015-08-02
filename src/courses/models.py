@@ -3,7 +3,7 @@
 # @Author: Salvatore Zaza
 # @Date:   2015-08-02 18:38:54
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-08-02 18:40:14
+# @Last Modified time: 2015-08-02 19:31:06
 
 from django.db import models
 # Create your models here.
@@ -18,7 +18,7 @@ from django.conf import settings
 import random, string
 
 from utils import QuerySet
-
+from django.utils import timezone
 
 class CourseManager(models.Manager):
     def filter_ongoing(self):
@@ -107,7 +107,7 @@ class Assignment(models.Model):
     Activation_date = models.DateField(null=True, blank=True)  # date after the Assignment will be available
     Due_date = models.DateTimeField(null=True, blank=True)
     Hard_date = models.DateTimeField(null=True, blank=True)
-    Has_due_date = models.BooleanField(default=False)  # ignore due date if false
+    # Has_due_date = models.BooleanField(default=False)  # ignore due date if false
     Penality_percent = models.IntegerField(null=True, blank=True)  # penality if complete after the due date
     Folder_path = models.CharField('Folder_path', max_length=200, null=True, blank=True, editable=False)
 
@@ -119,12 +119,20 @@ class Assignment(models.Model):
     def __str__(self):
         return '%s' % (self.Title)
 
+    def is_active(self):
+        return date.today() >= self.Activation_date
+
+    def is_closed(self):
+        return self.Hard_date <= timezone.now()
+
+    def has_due_date(self):
+        return self.Hard_date and (self.Hard_date != self.Due_date)
+
     def clean(self, *args, **kwargs):
         # add custom validation here
         if self.Due_date:
             if not self.Penality_percent:
                 raise ValidationError('Due date withouth penality percent')
-            self.Has_due_date = True
         # call default cleaning
         super(Assignment, self).clean(*args, **kwargs)
 
@@ -137,6 +145,8 @@ class Assignment(models.Model):
         self.full_clean()
         # call default save
         
+        if not self.Due_date and self.Hard_date:
+            self.Due_date = self.Hard_date
         self.UniqueString = self.Title.strip().upper()
         assignment_folder = join(self.Course.Folder_path, str(self).replace(' ', '_'))
         self.Folder_path = assignment_folder

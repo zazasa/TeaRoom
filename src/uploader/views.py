@@ -22,6 +22,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 import traceback
 from subprocess import Popen, PIPE, STDOUT
 
+from django.utils import timezone
 
 # Create your views here.
 class UploadAssignmentView(TemplateView):
@@ -198,7 +199,9 @@ class UploadResultView(TemplateView):
         'auth_error': 'User or password invalid',
         'success': 'Result submit successful',
         'result': 'Exercise result: %s',
-        'timedelta': 'Please wait 10 min from last submit. '
+        'timedelta': 'Please wait 10 min from last submit. ',
+        'hard_date': 'Sorry, too late, this exercise is expired in date: %s. ',
+        'due_date': 'You submitted out of due date. This exercise will be valuated at %s % '
     }
 
     def authenticate(self):
@@ -237,6 +240,18 @@ class UploadResultView(TemplateView):
                 return False
         return True
 
+    def check_hard_date(self, e):
+        now = timezone.now()
+        if e.Assignment.Hard_date <= now:
+            return False
+        return True
+
+    def check_due_date(self, e):
+        now = timezone.now()
+        if e.Assignment.has_due_date() and e.Assignment.Due_date <= now:
+            return False
+        return True
+
     def post(self, request):
         user = self.authenticate()
         if user:
@@ -245,8 +260,11 @@ class UploadResultView(TemplateView):
             submit_key = self.request.POST.get('submit_key')
             try:
                 e = user.exercise_set.get(id=ex_id)
+
                 if not self.check_submit_delay(e):
                     messages.info(self.request, self.messages['timedelta'])
+                elif not self.check_hard_date(e):
+                    messages.info(self.request, self.messages['hard_date'] % e.Assignment.Hard_date)
                 else:
                     self.check_submit_key(e, submit_key)
                     if req_type == 'download':
@@ -259,6 +277,8 @@ class UploadResultView(TemplateView):
                     r.save()
                     messages.info(self.request, self.messages['success'])
                     messages.info(self.request, self.messages['result'] % out)
+                    if not self.check_due_date(e):
+                        messages.info(self.request, self.messages['due_date'] % e.Assignment.Penality_percent)
             except ObjectDoesNotExist as e:
                 print ex_id
                 messages.error(self.request, self.messages['notexist'] % repr(e))
