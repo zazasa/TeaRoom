@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-11 16:35:37
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-24 21:30:24
+# @Last Modified time: 2015-07-10 19:21:04
 
 from django.contrib import admin
 # Register your models here.
@@ -40,7 +40,7 @@ class AssignmentAdmin(admin.ModelAdmin):
         Assignment View for Course
     '''
 
-    list_display = ('Number', 'Title', 'Activation_date', 'Course')
+    list_display = ('Number', 'Title', 'Creation_date', 'Activation_date', 'Course')
     readonly_fields = ('Folder_path',)
     list_filter = []
 
@@ -55,7 +55,7 @@ class ExerciseAdmin(admin.ModelAdmin):
         Exercise View for Course
     '''
 
-    list_display = ('Number', 'Description', 'Assignment', 'file_to_complete_list', 'file_to_test_list', 'parser_list')
+    list_display = ('id', 'Number', 'Description', 'Assignment', 'file_to_complete_list', 'file_to_test_list', 'parser_list')
     readonly_fields = ('Folder_path',)
 
     list_filter = []

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load add_get_parameter %} 
+
+{% load tz %}
+
+
+{% load with_user %}
+{% load with_exercise %}
+{% load with_group %}
+{% load get_groups %}
+
+{% block title %}{% with 'Assignments' as subtitle  %}
+{{ block.super }}
+{% endwith %}{% endblock %}
+
+{% block navbar-left %}
+{% include "_navbar.html" with active_link="Results" %}
+{% endblock %}
+
+{% block splash %}
+{% endblock splash %}
+
+{% block container %}
+
+<div class="row-fluid">
+    <div id="toolbar">
+        <div class="input-group-btn pull-left">
+        <button type="button" class="btn btn-info">Courses:</button>
+        <select class="selectpicker show-tick" >
+            {% for course in courses  %}
+                <option value="{{course.id}}" href="{% add_get selected_course_id=course.id %}" >{{course}}</option>
+            {% empty %}
+                <option >No courses available</option>
+            {% endfor %}
+        </select>
+        </div>
+    </div>
+
+    <table id='result-table' class="table table-hover" 
+    data-toggle="table"
+    data-toolbar="#toolbar"
+    data-filter-control="true"
+    data-pagination="true"
+    data-show-export="true"
+    data-minimum-count-columns="2"
+    data-pagination="true"
+    data-page-list="[10, 25, 50, 100, ALL]"
+    data-show-multi-sort="true"
+    data-striped='true'
+    >
+    <thead>
+        <tr>
+            <th data-valign='middle' data-field='student' data-filter-control="input" data-sortable="true">Student</th>
+            <th data-valign='middle' data-field='course' data-filter-control="input" data-sortable="true">Course</th>
+            <th data-valign='middle' data-field='assignment' data-filter-control="input" data-sortable="true">Assignment</th>
+            <th data-valign='middle' data-field='exercise' data-filter-control="input" data-sortable="true">Exercise</th>
+            <th data-valign='middle' data-field='result' data-filter-control="select" data-sortable="true">Result</th>
+            <th data-valign='middle' data-field='subdate' data-filter-control="input" data-sortable="true">Submission Date</th>
+            <th data-valign='middle' data-align='center' >Detail</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for exercise in exercise_list %}
+    {% for student in exercise.Students.all  %}
+    {% with student.result_set|with_exercise:exercise as result_set  %}
+    {% with result_set.last_result as result  %}
+    <tr>
+        <td>{{student.name}}</td>
+        <td>{{result.Exercise.Assignment.Course}}</td>
+        <td>{{result.Exercise.Assignment}}</td>
+        <td>{{result.Exercise.Description}}</td>
+        <td>{{result.Pass}}</td>
+        <td>{{result.Creation_date}}</td>
+        <td> 
+            <a href='{% url 'courses:single-result' %}?result_id={{result.id}}' class="btn btn-xs btn-info" data-toggle="tooltip" data-placement="top" title="Show details">
+            <span class="glyphicon glyphicon-search"></span></a>
+        </td>
+    </tr>
+    {% endwith %}    
+    {% endwith %}    
+    {% endfor %}
+    {% endfor %}
+
+    </tbody>
+    </table>
+</div>
+
+
+{% endblock container %}
+
+
+
+{% block scripts %}
+<script src="{% static 'site/js/site.js' %}"></script>
+
+
+<script type="text/javascript">
+    $('.selectpicker').selectpicker();
+    $('.selectpicker').selectpicker('val', '{{selected_course.id}}');
+    $('.selectpicker').on('change', function(){
+        var selected = $(this).find("option:selected").attr('href');
+        window.location.href = selected;
+    });
+
+</script>    
+
+
+{% endblock scripts %}

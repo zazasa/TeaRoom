@@ -1,5 +1,8 @@
 from .base import *
 
+import warnings
+warnings.showwarning = lambda *x: None
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

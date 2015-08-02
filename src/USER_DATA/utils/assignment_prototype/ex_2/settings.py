@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-18 17:33:58
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-05-24 20:19:13
+# @Last Modified time: 2015-07-25 15:26:03
 import os
 
 local_folder = os.path.dirname(os.path.abspath(__file__))
@@ -22,4 +22,5 @@ EX_SETTINGS = {
     
     'FILE_TO_TEST': 'test.py',
     'OUTPUT_PARSER': 'parser.py',
+    'GROUP': 'group1',
 }

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load add_get_parameter %} 
+
+{% load tz %}
+
+
+{% load with_user %}
+{% load with_exercise %}
+{% load with_group %}
+{% load get_groups %}
+
+{% block title %}{% with 'Assignments' as subtitle  %}
+{{ block.super }}
+{% endwith %}{% endblock %}
+
+{% block navbar-left %}
+{% include "_navbar.html" with active_link="None" %}
+{% endblock %}
+
+{% block splash %}
+{% endblock splash %}
+
+{% block container %}
+
+<div class="row-fluid">
+<div class="panel panel-info">
+      <div class="panel-heading">
+            <h3 class="panel-title">Result Detail</h3>
+      </div>
+      <div class="panel-body">
+            <p>Student: {{result.User}}</p>
+            <p>Result: {{result.Pass}}</p>
+            <p>Submission Date: {{result.Creation_date}}</p>
+            <div class="well">
+                {{result.Parser_output}}
+            </div>
+      </div>
+</div>
+<div class="panel panel-info">
+      <div class="panel-heading">
+            <h3 class="panel-title">Submission History</h3>
+      </div>
+      <div class="panel-body">
+      <div class="list-group">
+          <a href="#" class="list-group-item">
+              {% for oldres in result_history  %}
+              <p class="list-group-item-text">
+                <p>Student: {{oldres.User}}</p>
+                <p>Result: {{oldres.Pass}}</p>
+                <p>Submission Date: {{oldres.Creation_date}}</p>
+                <div class="well">
+                    {{oldres.Parser_output}}
+                </div>
+              </p>
+            {% empty %}    
+                <p> There are no further submits.</p>
+            {% endfor %}
+          </a>
+      </div>
+            
+      </div>
+</div>
+
+</div>
+
+
+{% endblock container %}
+
+
+
+{% block scripts %}
+<script src="{% static 'site/js/site.js' %}"></script>
+
+
+<script type="text/javascript">
+</script>    
+
+
+{% endblock scripts %}

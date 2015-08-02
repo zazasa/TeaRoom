@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load add_get_parameter %} 
+
+{% load tz %}
+
+
+{% load with_user %}
+{% load with_exercise %}
+{% load with_group %}
+{% load get_groups %}
+
+{% block title %}{% with 'Assignments' as subtitle  %}
+{{ block.super }}
+{% endwith %}{% endblock %}
+
+{% block navbar-left %}
+{% include "_navbar.html" with active_link="Assignments" %}
+{% endblock %}
+
+{% block splash %}
+{% endblock splash %}
+
+{% block container %}
+<div class="row-fluid">
+  <div class="input-group-btn">
+    <button type="button" class="btn btn-info">Courses:</button>
+    <select class="selectpicker show-tick" >
+        {% for course in courses  %}
+            <option value="{{course.id}}" href="{% add_get selected_course_id=course.id %}" >{{course}}</option>
+        {% empty %}
+            <option >No courses available</option>
+        {% endfor %}
+    </select>
+  </div>
+</div>
+<br>
+<div class="row-fluid">
+    <div class="list-group">
+      {% for assignment in assignments %}
+        <div class="list-group-item list-group-item-info toggle clearfix" id="dropdown-detail-{{ assignment.id }}" data-toggle="detail-{{ assignment.id }}" style="cursor: pointer; cursor: hand;">
+        <h4 class="list-group-item-heading ">{{ assignment.Title }}
+        <button class="pull-right auto-shuffle-btn btn btn-sm btn-primary" assignment-id="{{assignment.id}}">
+        <span>Auto Shuffle</span></button></h4> 
+        </div>
+        <div id="detail-{{ assignment.id }}" style="display:none">
+            <div class="panel panel-primary">                  
+              <div class="panel-body">
+                    {% with assignment.exercise_set.all as exercise_set %}
+                        {% for group in exercise_set|get_groups  %}
+                            <fieldset class="exgroup-border">
+                                <legend class="exgroup-border">{{group}}</legend>
+                                {% for exercise in exercise_set|with_group:group %}
+                                    <div class="list-group">
+                                        <div class="ex-header list-group-item list-group-item-info clearfix">
+                                            <div class='col-xs-6'>
+                                                <h4 class="list-group-item-heading ">{{exercise.Description}}</h4>
+                                            </div>
+                                            <div class='col-xs-6'>
+                                                <div class='list-group-item-text pull-right'>
+                                                    
+                                                    <button class="add-students-btn btn btn-sm btn-primary" exercise-id="{{exercise.id}}">
+                                                    <span>Add Students</span></button>
+                                                    <a href="{% url 'courses:download-user-file' %}?ex_id={{exercise.id}}" 
+                                                    type="button" class="btn btn-sm btn-info">Download exercise</a>         
+                                                    <button class="btn btn-info btn-sm btn-filter" data-toggle="tooltip" data-placement="top" 
+                                                                    title="Filters">
+                                                    <span class="glyphicon glyphicon-filter"></span></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="exercise-table-{{exercise.id}}" 
+                                                class='ex-content filterable list-group-item-text {% if not exercise.Students.all %} hidden {% endif %} ' 
+                                                style="padding-left:50px">
+
+                                            <table class="table table-striped table-hover table-bordered">
+
+                                                    <thead>
+                                                        <tr class='filters'>
+                                                            <th><input type="text" class="form-control" placeholder="Student" disabled></th>
+                                                            <th><input type="text" class="form-control" placeholder="Result" disabled></th>
+                                                            <th><input type="text" class="form-control" placeholder="Submission Date" disabled></th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody >
+                                                    {% for student in exercise.Students.all  %}
+                                                        <tr>
+                                                            <td>{{student.name}}</td>
+                                                            {% if student.result_set|with_exercise:exercise %}
+                                                            {% with student.result_set|with_exercise:exercise as result  %}
+                                                            <td>{{result.last_result.Pass}}</td>
+                                                            <td>{% localtime off %}
+                                                                {{result.last_result.Creation_date|date:"F j, H:i"}}
+                                                                {% endlocaltime %}
+                                                            </td>
+                                                            {% endwith %}
+                                                            
+                                                            {% else %}
+                                                            <td>N/A</td>
+                                                            <td>N/A</td>                                                                
+                                                            {% endif %}
+                                                            <td align="center"> 
+                                                                <button class="student-rem btn btn-xs btn-danger" 
+                                                                    data-toggle="tooltip" data-placement="top" 
+                                                                    title="Remove from exercise" exercise-id='{{exercise.id}}' student-id='{{student.id}}'>
+                                                                    <span class="glyphicon glyphicon-remove"></span></button>
+                                                                {% if student.result_set|with_exercise:exercise %}
+                                                                {% with student.result_set|with_exercise:exercise as result  %}
+                                                                <a href='{% url 'courses:single-result' %}?result_id={{result.last_result.id}}'
+                                                                    class="btn btn-xs btn-info" data-toggle="tooltip" data-placement="top" 
+                                                                    title="Show details">
+                                                                    <span class="glyphicon glyphicon-search"></span></a>
+                                                                {% endwith %}
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                        
+                                                    {% endfor %}
+                                                    </tbody>
+                                        </table> 
+                                        </div>
+                                        <p align="center" class='empty-string {% if exercise.Students.all %} hidden {% endif %}' >No students for this exercise</p>
+                                        <hr>
+                                    </div>
+                                {% empty %} 
+                                    <p> There are no exercises assigned for this session.</p>
+                                {% endfor %} 
+                            </fieldset>
+                        {% endfor %}
+                    {% endwith %}
+            </div>
+        </div>
+    </div>
+    <br>
+    {% empty %}
+    <p class="list-group-item list-group-item-text list-group-item-warning"> There are no assignments for this course.</p>
+    {% endfor %}
+ 
+    </div>
+</div>
+{# side panel#}
+<div id='slider-panel' class='hidden'>
+    <div class="panel panel-primary">
+          <div class="panel-heading">
+                <h3 class="panel-title">Select students</h3>
+          </div>          
+          <div class="panel-body">
+                {% if selected_course.Students.all %}
+                    <ul id='students-selector' class="list-group checked-list-box" exercise-id="None">                
+                    {% for student in selected_course.Students.all  %}
+                        <li class="list-group-item" ><span class='hidden'>{{student.id}}</span>{{student.name}}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No Students Enrolled.</p>
+                {% endif %}
+          </div>
+        <div class="panel-footer">
+            <span id='student-select-all' class="button-checkbox">
+                <button type="button" class="btn" data-color="primary">Select All</button>
+                <input type="checkbox" class="hidden" />
+            </span>
+            <span id='student-add' class="pull-right">
+                <button type="button" class="btn btn-danger" >Add</button>
+            </span>
+        </div>
+    </div> 
+</div> 
+
+
+  
+
+
+{% endblock container %}
+
+
+
+{% block scripts %}
+<script src="{% static 'site/js/site.js' %}"></script>
+
+<script type="text/javascript">
+    $('.selectpicker').selectpicker();
+    $('.selectpicker').selectpicker('val', '{{selected_course.id}}');
+    $('.selectpicker').on('change', function(){
+        var selected = $(this).find("option:selected").attr('href');
+        window.location.href = selected;
+    });
+
+    $('.add-students-btn').on('click', function(e){
+        e.stopPropagation();       
+        var ex_id = $(e.currentTarget).attr("exercise-id");
+        $('#students-selector').prop('exercise-id',ex_id);
+
+    });
+
+    $('#slider-panel').slideReveal({
+        push: false,
+        top: 100,
+        position: 'right',
+        trigger: $(".add-students-btn"),
+    });
+    $('#slider-panel').removeClass('hidden');
+    
+    var href = {% url 'courses:single-result' %};
+
+    function update_exercise (exercise_list) {
+
+        exercise_list.forEach(function(item){
+            var content = '';
+            console.log(item)
+            console.log($('#exercise-table-'+item.exercise_id+' table tbody'))
+            
+            ex_table = $('#exercise-table-'+item.exercise_id+' table tbody');
+            if(!item.student_list.length){
+                $('#exercise-table-'+item.exercise_id).addClass('hidden');
+                $('#exercise-table-'+item.exercise_id).next('.empty-string').removeClass('hidden');
+            }else{
+                $('#exercise-table-'+item.exercise_id).removeClass('hidden');
+            $('#exercise-table-'+item.exercise_id).next('.empty-string').addClass('hidden');    
+            }
+            item.student_list.forEach(function(student){
+                console.log(student)
+                content+='<tr>';
+                content+='<td>'+student.student+'</td>';
+                content+='<td>'+student.result+'</td>';
+                content+='<td>'+student.date+'</td>';
+                content+='  <td align="center"> \
+                            <button class="student-rem btn btn-xs btn-danger" \
+                            data-toggle="tooltip" data-placement="top" \
+                            title="Remove from exercise" exercise-id='+item.exercise_id+' student-id='+student.student_id+'> \
+                            <span class="glyphicon glyphicon-remove"></span></button> '
+                if (student.result_id !='false'){
+                    content+='<a href="'+href+'?result_id='+student.result_id+'"}} \
+                            class="btn btn-xs btn-info" data-toggle="tooltip" data-placement="top" \
+                            title="Show details"> \
+                            <span class="glyphicon glyphicon-search"></span></a> \
+                            </td> '
+                }
+                            
+                content+='</tr>';
+            })
+            ex_table.html(content)
+        })
+    }
+
+
+    $('body').on('click','.student-rem', function(e) {
+        console.log('click')
+        console.log($(this).attr('exercise-id'))
+        console.log($(this).attr('student-id'))
+        var ex_id = $(this).attr('exercise-id');
+        var student_id = $(this).attr('student-id');
+        console.log(ex_id, student_id)
+
+        $.ajax({
+            url : "/assignment-list-staff/", // the endpoint
+            type : "POST", // http method
+            data : { 
+                action:'remove',
+                ex_id : ex_id,
+                student_id: student_id,
+            }, // data sent with the post request
+
+            // handle a successful response
+            success : function(json) {
+                // console.log(json); // log the returned json to the console
+                // console.log("success"); // another sanity check
+                update_exercise(json.exercise_list)
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log('NO WAY')
+                // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+
+    })
+
+    $('#student-add').on('click', function(e) {
+        e.preventDefault(); 
+        var ex_id = $('#students-selector').prop('exercise-id');
+        var students_id = [];
+        $("#students-selector li.active").each(function(idx, li) {
+          students_id.push($(li).find('.hidden').text());
+        });
+        // console.log(JSON.stringify(students_id));
+        // console.log(ex_id);
+
+        $.ajax({
+            url : "/assignment-list-staff/", // the endpoint
+            type : "POST", // http method
+            data : { 
+                action:'add',
+                ex_id : ex_id,
+                students_id: JSON.stringify(students_id),
+            }, // data sent with the post request
+
+            // handle a successful response
+            success : function(json) {
+                // console.log(json); // log the returned json to the console
+                // console.log("success"); // another sanity check
+                update_exercise(json.exercise_list)
+
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log('NO WAY')
+                // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+
+        $('#slider-panel').slideReveal("hide");
+    });
+
+
+
+</script>    
+
+
+{% endblock scripts %}

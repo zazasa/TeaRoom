@@ -74,7 +74,9 @@ class UploadAssignmentView(TemplateView):
             raise Exception('Course with id %s doesnt exist.' % (course_id))
         try:
             a = Assignment.objects.get(Course=c, Number=assignment_number)
+            messages.info(self.request, 'Assigment already exists. Updating.')
         except:
+            messages.info(self.request, 'Assigment doesnt exists. Creating.')
             a = Assignment(Course=c, Title=settings['ASSIGNMENT_TITLE'], Number=assignment_number, Has_due_date=False)
         a.Title = settings['ASSIGNMENT_TITLE']
         activation_date = settings['ACTIVATION_DATE']
@@ -100,11 +102,14 @@ class UploadAssignmentView(TemplateView):
             try:
                 # Update pre-existing exercise
                 e = Exercise.objects.get(Assignment=a, Number=ordinal_number)
+                messages.info(self.request, 'Exercise %s already exists. Updating.' % str(e.id))
             except:
                 # Exercise does not exist: create it
                 e = Exercise(Assignment=a, Description=ex_setting['SHORT_DESCRIPTION'], Number=ordinal_number)
+                messages.info(self.request, 'Exercise %s doesnt exists. Creating.' % str(e.id))
             e.Description = ex_setting['SHORT_DESCRIPTION']
             e.Points = ex_setting['POINTS']
+            e.Group = ex_setting['GROUP']
             e.save()
 
             exercise_folder = str(e.Folder_path)
@@ -115,7 +120,7 @@ class UploadAssignmentView(TemplateView):
             old_package = None
             try:
                 old_package = UserFile.objects.get(Exercise=e, Type='package')
-                remove( join(settings.USER_DATA_ROOT, str(old_package)) )
+                remove(join(settings.USER_DATA_ROOT, str(old_package)))
             except MultipleObjectsReturned as exc:
                 raise Exception(exc)
             except:
@@ -151,7 +156,7 @@ class UploadAssignmentView(TemplateView):
             data = "SUBMIT_KEY = %s \n" % str(int(binascii.hexlify(str(e.Submit_key)), 16)) + data
             modified.write(data)
         compile(destination_file, doraise=True)
-        remove(destination_file)
+        # remove(destination_file)
 
     def create_user_package(self, e, dest_user_files, ex_folder, package_name):
         # Save to disk
@@ -254,6 +259,7 @@ class UploadResultView(TemplateView):
                     messages.info(self.request, self.messages['success'])
                     messages.info(self.request, self.messages['result'] % out)
             except ObjectDoesNotExist as e:
+                print ex_id
                 messages.error(self.request, self.messages['notexist'] % repr(e))
             except Exception:
                 messages.error(self.request, self.messages['generic_error'] % traceback.format_exc())

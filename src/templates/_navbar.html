@@ -1,8 +1,21 @@
+{% load add_get_parameter %} 
+
 {# <li {% if active_link == "home" %}class="active"{% endif %}><a href="{% url 'home' %}">Home</a></li> #}
 {# <li {% if active_link == "about" %}class="active"{% endif %}><a href="{% url 'about' %}">About</a></li> #}
-{% if user.is_authenticated %}
+{% if user.is_authenticated and not user.is_staff %}
 <li {% if active_link == "Courses" %}class="active"{% endif %}><a href="{% url 'courses:course-list' %}">Courses</a></li>
 <li {% if active_link == "Assignments" %}class="active"{% endif %}><a href="{% url 'courses:assignment-list' %}">Assignments</a></li>
 <li {% if active_link == "Submit" %}class="active"{% endif %}><a href="{% url 'courses:result-list' %}">Submit history</a></li>
-<li {% if active_link == "Help" %}class="active"{% endif %}><a href="{% url 'help' %}">Help</a></li>
+{# <li {% if active_link == "Help" %}class="active"{% endif %}><a href="{% url 'help' %}">Help</a></li> #}
 {%endif%}
+
+
+{% if user.is_authenticated and user.is_staff %}
+<li {% if active_link == "Courses" %}class="active"{% endif %}><a href="{% url 'courses:course-list-staff' %}">Courses</a></li>
+<li {% if active_link == "Assignments" %}class="active"{% endif %}><a href="{% url 'courses:assignment-list-staff' %}">Assignments</a></li>
+<li {% if active_link == "Results" %}class="active"{% endif %}><a href="{% url 'courses:result-list-staff' %}">Results</a></li>
+{# <li {% if active_link == "Users" %}class="active"{% endif %}><a href="{% url 'courses:user-list-staff' %}">Submit history</a></li> #}
+{# <li {% if active_link == "Help" %}class="active"{% endif %}><a href="{% url 'help' %}">Help</a></li> #}
+{%endif%}
+
+
