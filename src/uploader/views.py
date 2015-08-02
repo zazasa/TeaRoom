@@ -68,16 +68,17 @@ class UploadAssignmentView(TemplateView):
 
     def parse_assignment_settings(self, settings):
         course_id = settings['COURSE_ID']
-        assignment_number = settings['ASSIGNMENT_NUMBER']
+        # assignment_number = settings['ASSIGNMENT_NUMBER']
+        uniqueString = settings['ASSIGNMENT_TITLE'].strip().upper()
         c = Course.objects.get(id=course_id)
         if not c:
             raise Exception('Course with id %s doesnt exist.' % (course_id))
         try:
-            a = Assignment.objects.get(Course=c, Number=assignment_number)
+            a = Assignment.objects.get(Course=c, UniqueString=uniqueString)
             messages.info(self.request, 'Assigment already exists. Updating.')
         except:
             messages.info(self.request, 'Assigment doesnt exists. Creating.')
-            a = Assignment(Course=c, Title=settings['ASSIGNMENT_TITLE'], Number=assignment_number, Has_due_date=False)
+            a = Assignment(Course=c, Title=settings['ASSIGNMENT_TITLE'], Has_due_date=False)
         a.Title = settings['ASSIGNMENT_TITLE']
         activation_date = settings['ACTIVATION_DATE']
         hard_date = settings['HARD_DATE']

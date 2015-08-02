@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Author: Salvatore Zaza
+# @Date:   2015-08-02 18:38:54
+# @Last Modified by:   Salvatore Zaza
+# @Last Modified time: 2015-08-02 18:40:14
+
 from django.db import models
 # Create your models here.
 from datetime import date
@@ -94,7 +101,7 @@ class Assignment(models.Model):
 
     Course = models.ForeignKey(Course)
 
-    Number = models.IntegerField(null=True, blank=True)
+    UniqueString = models.CharField('UniqueString', max_length=50, default='None', null=False)
     Title = models.CharField('Title', max_length=50)
     Creation_date = models.DateField(editable=False, auto_now_add=True)
     Activation_date = models.DateField(null=True, blank=True)  # date after the Assignment will be available
@@ -107,7 +114,7 @@ class Assignment(models.Model):
     class Meta:
         verbose_name = "Assignment"
         verbose_name_plural = "3-Assignments"
-        unique_together = (("Course", "Number"),)
+        unique_together = (("Course", "UniqueString"),)
 
     def __str__(self):
         return '%s' % (self.Title)
@@ -130,6 +137,7 @@ class Assignment(models.Model):
         self.full_clean()
         # call default save
         
+        self.UniqueString = self.Title.strip().upper()
         assignment_folder = join(self.Course.Folder_path, str(self).replace(' ', '_'))
         self.Folder_path = assignment_folder
         super(Assignment, self).save(*args, **kwargs)

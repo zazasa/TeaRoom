@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-11 16:35:37
 # @Last Modified by:   salvo
-# @Last Modified time: 2015-07-10 19:21:04
+# @Last Modified time: 2015-08-02 18:07:10
 
 from django.contrib import admin
 # Register your models here.
@@ -40,7 +40,7 @@ class AssignmentAdmin(admin.ModelAdmin):
         Assignment View for Course
     '''
 
-    list_display = ('Number', 'Title', 'Creation_date', 'Activation_date', 'Course')
+    list_display = ('Title', 'Creation_date', 'Activation_date', 'Course')
     readonly_fields = ('Folder_path',)
     list_filter = []
 
