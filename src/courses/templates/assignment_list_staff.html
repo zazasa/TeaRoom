@@ -61,9 +61,9 @@
                             will be activated in date {{assignment.Activation_date}}
                         {% endif %} 
                     </p>
-                    <p class="list-group-item-text"> Hard Date: <span class='hd-info'>{{assignment.Hard_date|date:"F j, H:i"}}</span></p>
                     <p class="list-group-item-text {% if  assignment.Hard_date == assignment.Due_date %}hidden{% endif %}"> 
                     Due Date: <span class='dd-info'>{{assignment.Due_date|date:"F j, H:i"}}</span></p>    
+                    <p class="list-group-item-text"> Hard Date: <span class='hd-info'>{{assignment.Hard_date|date:"F j, H:i"}}</span></p>
                     <p class="list-group-item-text {% if  assignment.Hard_date == assignment.Due_date %}hidden{% endif %}"> 
                     Penalty Percent: <span class='pp-info'>{{assignment.Penalty_percent}} </span>%</p>    
                     </div>
