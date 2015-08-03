@@ -79,7 +79,7 @@ class UploadAssignmentView(TemplateView):
             messages.info(self.request, 'Assigment already exists. Updating.')
         except:
             messages.info(self.request, 'Assigment doesnt exists. Creating.')
-            a = Assignment(Course=c, Title=settings['ASSIGNMENT_TITLE'], Has_due_date=False)
+            a = Assignment(Course=c, Title=settings['ASSIGNMENT_TITLE'])
         a.Title = settings['ASSIGNMENT_TITLE']
         activation_date = settings['ACTIVATION_DATE']
         hard_date = settings['HARD_DATE']
