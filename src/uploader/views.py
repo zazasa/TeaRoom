@@ -84,14 +84,14 @@ class UploadAssignmentView(TemplateView):
         activation_date = settings['ACTIVATION_DATE']
         hard_date = settings['HARD_DATE']
         due_date = settings['DUE_DATE']
-        penality_percent = settings['PENALITY_PERCENT']
+        penalty_percent = settings['PENALTY_PERCENT']
 
         if activation_date:
             a.Activation_date = activation_date
         if due_date:
             a.Due_date = due_date
-            if penality_percent:
-                a.Penality_percent = penality_percent
+            if penalty_percent:
+                a.Penalty_percent = penalty_percent
         if hard_date:
             a.Hard_date = hard_date
 
@@ -278,7 +278,7 @@ class UploadResultView(TemplateView):
                     messages.info(self.request, self.messages['success'])
                     messages.info(self.request, self.messages['result'] % out)
                     if not self.check_due_date(e):
-                        messages.info(self.request, self.messages['due_date'] % e.Assignment.Penality_percent)
+                        messages.info(self.request, self.messages['due_date'] % e.Assignment.Penalty_percent)
             except ObjectDoesNotExist as e:
                 print ex_id
                 messages.error(self.request, self.messages['notexist'] % repr(e))

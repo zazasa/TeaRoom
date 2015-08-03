@@ -3,7 +3,7 @@
 # @Author: Salvatore Zaza
 # @Date:   2015-08-02 18:38:54
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-08-02 19:31:06
+# @Last Modified time: 2015-08-03 14:51:54
 
 from django.db import models
 # Create your models here.
@@ -17,8 +17,8 @@ from os import makedirs
 from django.conf import settings
 import random, string
 
-from utils import QuerySet
 from django.utils import timezone
+
 
 class CourseManager(models.Manager):
     def filter_ongoing(self):
@@ -108,7 +108,7 @@ class Assignment(models.Model):
     Due_date = models.DateTimeField(null=True, blank=True)
     Hard_date = models.DateTimeField(null=True, blank=True)
     # Has_due_date = models.BooleanField(default=False)  # ignore due date if false
-    Penality_percent = models.IntegerField(null=True, blank=True)  # penality if complete after the due date
+    Penalty_percent = models.IntegerField(null=True, blank=True)  # penalty if complete after the due date
     Folder_path = models.CharField('Folder_path', max_length=200, null=True, blank=True, editable=False)
 
     class Meta:
@@ -131,8 +131,8 @@ class Assignment(models.Model):
     def clean(self, *args, **kwargs):
         # add custom validation here
         if self.Due_date:
-            if not self.Penality_percent:
-                raise ValidationError('Due date withouth penality percent')
+            if not self.Penalty_percent:
+                raise ValidationError('Due date withouth penalty percent')
         # call default cleaning
         super(Assignment, self).clean(*args, **kwargs)
 

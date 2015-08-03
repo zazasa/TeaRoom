@@ -43,32 +43,47 @@
         <div class="list-group-item list-group-item-info toggle clearfix" id="dropdown-detail-{{ assignment.id }}" data-toggle="detail-{{ assignment.id }}" style="cursor: pointer; cursor: hand;">
         <div class="col-xs-6">
             <h4 class="list-group-item-heading ">{{ assignment.Title }} </h4>
-            <p class="list-group-item-text">
-                Status: 
-                {% if  assignment.is_active %}
-                    Active
-                {% else %}     
-                    will be activated in date {{assignment.Activation_date}}
-                {% endif %} 
-            </p>
-            <p class="list-group-item-text"> Hard Date: {{assignment.Hard_date|date:"F j, H:i"}}</p>
-            {% if  assignment.Hard_date != assignment.Due_date %}
-                <p class="list-group-item-text"> Due Date: {{assignment.Due_date|date:"F j, H:i"}}</p>    
-                <p class="list-group-item-text"> Penality Percent: {{assignment.Penality_percent}} %</p>    
-            {% endif %}
+           
         </div>
-        <div class="col-xs-6">
-            <button class="pull-right auto-shuffle-btn btn btn-sm btn-primary" assignment-id="{{assignment.id}}">
-            <span>Auto Shuffle</span></button> 
-        </div>
+
         </div>
         <div id="detail-{{ assignment.id }}" style="display:none">
             <div class="panel panel-primary">                  
               <div class="panel-body">
+                    <fieldset class="exgroup-border">
+                    <legend class="exgroup-border">Info</legend>
+                    <div class="col-xs-6">
+                    <p class="list-group-item-text">
+                        Status: 
+                        {% if  assignment.is_active %}
+                            Active
+                        {% else %}     
+                            will be activated in date {{assignment.Activation_date}}
+                        {% endif %} 
+                    </p>
+                    <p class="list-group-item-text"> Hard Date: <span class='hd-info'>{{assignment.Hard_date|date:"F j, H:i"}}</span></p>
+                    <p class="list-group-item-text {% if  assignment.Hard_date == assignment.Due_date %}hidden{% endif %}"> 
+                    Due Date: <span class='dd-info'>{{assignment.Due_date|date:"F j, H:i"}}</span></p>    
+                    <p class="list-group-item-text {% if  assignment.Hard_date == assignment.Due_date %}hidden{% endif %}"> 
+                    Penalty Percent: <span class='pp-info'>{{assignment.Penalty_percent}} </span>%</p>    
+                    </div>
+                    <div class="col-xs-6">
+                    <div class="row">
+                    <button class="pull-right auto-shuffle-btn btn btn-sm btn-primary" assignment-id="{{assignment.id}}">
+                    <span>Auto Shuffle</span></button>     
+                    </div>
+                    <br>
+                    <div class="row">
+                    <button class="pull-right change-date-btn btn btn-sm btn-primary" 
+                        assignment-id="{{assignment.id}}" assignment-title="{{assignment.Title}}" assignment-hard-date="{{assignment.Hard_date|date:'c'}}">
+                    <span>Change Deadline</span></button> 
+                    </div>
+                    </div>
+                    </fieldset>
                     {% with assignment.exercise_set.all as exercise_set %}
                         {% for group in exercise_set|get_groups  %}
                             <fieldset class="exgroup-border">
-                                <legend class="exgroup-border">{{group}}</legend>
+                                <legend class="exgroup-border">Exercise group: {{group}}</legend>
                                 {% for exercise in exercise_set|with_group:group %}
                                     <div class="list-group">
                                         <div class="ex-header list-group-item list-group-item-info clearfix">
@@ -187,8 +202,52 @@
     </div> 
 </div> 
 
-
-  
+<div class="modal fade" id="change-deadline-modal">
+    <div class="modal-dialog">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Select date for: <span id='assignment-title'></span></h3>
+        </div>
+        <div class="panel-body">
+            <p class='hidden' id='assignment-id'></p>
+            <form action="" method="POST" class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label for="first-date" class="col-sm-2 control-label">Deadline</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="first-date">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                      <div class="checkbox" >
+                        <label>
+                          <input type="checkbox" id='use-penalty-cb'>Use penalty</label>
+                      </div>
+                    </div>
+                </div>
+                <div class="form-group use-penalty use-penalty-form hidden">
+                    <label for="second-date" class="col-sm-2 control-label">Late date</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="second-date" >
+                    </div>
+                </div>
+                <div class="form-group use-penalty-form hidden">
+                    <label for="penalty-percent" class="col-sm-2 control-label">Penalty percent</label>
+                    <div class="col-sm-10">
+                    <input type="number" class="form-control" id="penalty-percent" value="50">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-primary" id='change-deadline-submit' data-dismiss="modal">Submit</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Abort</button>
+            </div>
+        </div>
+    </div>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 {% endblock container %}
@@ -220,7 +279,101 @@
         trigger: $(".add-students-btn"),
     });
     $('#slider-panel').removeClass('hidden');
-    
+
+
+
+
+// set deadline js methods
+
+    function update_assignment(assignment_id, info){
+        $('#detail-'+assignment_id).find('.hd-info').text(info.hard_date)
+        $('#detail-'+assignment_id).find('.dd-info').text(info.due_date)
+        $('#detail-'+assignment_id).find('.pp-info').text(info.penalty_percent)
+        use_penalty = info.use_penalty=='True'
+        $('#detail-'+assignment_id).find('.dd-info').parent().toggleClass('hidden', !use_penalty)
+        $('#detail-'+assignment_id).find('.pp-info').parent().toggleClass('hidden', !use_penalty)
+    }
+
+    $('#change-deadline-submit').on('click', function(e){    
+        var use_penalty = $('#use-penalty-cb').is(':checked').toString()
+        var first_date = $('#first-date').data("DateTimePicker").viewDate().format()
+            if ($('#second-date').data("DateTimePicker")){
+                var second_date = $('#second-date').data("DateTimePicker").viewDate().format()
+            } else { var second_date = "false" }
+            
+        var penalty_percent = $('#penalty-percent').val().toString();
+        var assignment_id = $('#change-deadline-modal').find('#assignment-id').text();
+
+        $.ajax({
+            url : "/assignment-list-staff/", // the endpoint
+            type : "POST", // http method
+            data : { 
+                action:'change-date',
+                assignment_id: assignment_id,
+                use_penalty: use_penalty,
+                first_date: first_date,
+                second_date: second_date,
+                penalty_percent: penalty_percent
+            }, // data sent with the post request
+
+            // handle a successful response
+            success : function(json) {
+                update_assignment(assignment_id,json.updated_assignment)
+                // console.log("success"); // another sanity check
+                // update_exercise(json.exercise_list)
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log('NO WAY')
+                // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+
+    });
+
+    $('#use-penalty-cb').change(function() {
+        var use_penalty = $(this).is(':checked');
+        $('.use-penalty-form').toggleClass('hidden',!use_penalty)
+        if (use_penalty){
+            var min_date = $('#first-date').data("DateTimePicker").viewDate();
+            if ($('#second-date').data("DateTimePicker")){
+                $('#second-date').val("")
+                $('#second-date').data("DateTimePicker").destroy()
+            }
+            $('#second-date').datetimepicker({showClose:true, defaultDate:moment(min_date), minDate:moment(min_date), format:"MMMM D, H:mm"});
+            
+        }
+    });
+
+    $('.change-date-btn').on('click', function(e){
+        // var $form=$(this).closest('form');
+        // e.preventDefault();
+        $('#use-penalty-cb').prop('checked', false).trigger("change");
+        var assignment_title = $(e.currentTarget).attr("assignment-title");
+        var assignment_id = $(e.currentTarget).attr("assignment-id");
+        var assignment_hard_date = $(e.currentTarget).attr("assignment-hard-date");
+        if ($('#first-date').data("DateTimePicker")){
+            $('#first-date').val("")
+            $('#first-date').data("DateTimePicker").destroy()
+        }
+        $('#first-date').datetimepicker({showClose:true, defaultDate:assignment_hard_date, format:"MMMM D, H:mm"});    
+        $('#first-date').on("dp.change", function (e) { 
+            if ($('#second-date').data("DateTimePicker")){
+                $('#second-date').val("")
+                $('#second-date').data("DateTimePicker").destroy()   
+                $('#second-date').datetimepicker({showClose:true,defaultDate:moment(e.date), minDate:moment(e.date), format:"MMMM D, H:mm"});
+            }
+        })
+        
+        $('#change-deadline-modal').find('#assignment-title').text(assignment_title);
+        $('#change-deadline-modal').find('#assignment-id').text(assignment_id);
+        $('#change-deadline-modal').modal()
+    });
+
+
+
+// add student js methods
     var href = {% url 'courses:single-result' %};
 
     function update_exercise (exercise_list) {

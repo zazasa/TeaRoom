@@ -17,6 +17,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 import json
 import traceback
+from datetime import datetime
 
 
 class CourseListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListView):
@@ -176,19 +177,47 @@ class AssignmentListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListVi
         Assigned.objects.filter(Student=s, Exercise_id=e).delete()
         return self._get_students([e])
 
+    def _change_date(self, assignment_id, first_date, second_date, use_penalty, penalty_percent):
+        print '_change_date'
+        first_date = datetime.strptime(first_date[:-6], '%Y-%m-%dT%H:%M:%S')
+        if second_date:
+            second_date = datetime.strptime(second_date[:-6], '%Y-%m-%dT%H:%M:%S')
+        use_penalty = use_penalty == 'true'
+        penalty_percent = int(penalty_percent)
+        a = Assignment.objects.get(id=assignment_id)
+        if use_penalty:
+            if not second_date or (second_date < first_date): raise Exception('first date after second date.')
+            a.Hard_date = second_date
+            a.Due_date = first_date
+            a.Penalty_percent = penalty_percent
+            a.save()
+        else:
+            a.Hard_date = first_date
+            a.Due_date = first_date
+            a.save()
+        print 'worked'
+        return {'hard_date': str(a.Hard_date.strftime('%B %d, %H:%M')), 'due_date': str(a.Due_date.strftime('%B %d, %H:%M')), 'penalty_percent': str(a.Penalty_percent), 'use_penalty': str(a.has_due_date())}
+
     def post(self, request):
-        print 'POST REQUEST'
         response_data = {}
         user = self.request.user
-        exercise_id = self.request.POST.get('ex_id') or False
-        students_id = self.request.POST.get('students_id') or False
-        student_id = self.request.POST.get('student_id') or False
         action = self.request.POST.get('action') or False
-
-        print action, exercise_id, students_id, student_id
-
         try:
-            if action == 'add':
+            if action == 'change-date':
+                assignment_id = self.request.POST.get('assignment_id') or False
+                first_date = self.request.POST.get('first_date') or False
+                if first_date == 'false': second_date = False
+                second_date = self.request.POST.get('second_date') or False
+                if second_date == 'false': second_date = False
+                use_penalty = self.request.POST.get('use_penalty') or False
+                penalty_percent = self.request.POST.get('penalty_percent') or False
+                updated_assignment = self._change_date(assignment_id, first_date, second_date, use_penalty, penalty_percent)
+                print updated_assignment
+                response_data['updated_assignment'] = updated_assignment
+                response_data['result'] = 'Data change successfull!'
+            elif action == 'add':
+                exercise_id = self.request.POST.get('ex_id') or False
+                students_id = self.request.POST.get('students_id') or False
                 if exercise_id and students_id:
                     exercise_id = int(exercise_id)
                     students_id = map(int, json.loads(students_id))
@@ -196,6 +225,8 @@ class AssignmentListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListVi
                     response_data['exercise_list'] = exercise_list
                     response_data['result'] = 'Student adding successfull!'
             elif action == 'remove':
+                exercise_id = self.request.POST.get('ex_id') or False
+                student_id = self.request.POST.get('student_id') or False
                 if exercise_id and student_id:
                     exercise_id = int(exercise_id)
                     students_id = int(students_id)

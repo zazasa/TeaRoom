@@ -67,6 +67,7 @@
     {% for student in exercise.Students.all  %}
     {% with student.result_set|with_exercise:exercise as result_set  %}
     {% with result_set.last_result as result  %}
+    {% if result %}
     <tr>
         <td>{{student.name}}</td>
         <td>{{result.Exercise.Assignment.Course}}</td>
@@ -79,6 +80,7 @@
             <span class="glyphicon glyphicon-search"></span></a>
         </td>
     </tr>
+    {% endif %}
     {% endwith %}    
     {% endwith %}    
     {% endfor %}
