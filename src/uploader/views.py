@@ -73,12 +73,12 @@ class UploadAssignmentView(TemplateView):
         uniqueString = settings['ASSIGNMENT_TITLE'].strip().upper()
         c = Course.objects.get(id=course_id)
         if not c:
-            raise Exception('Course with id %s doesnt exist.' % (course_id))
+            raise Exception('Course with id %s does not exist.' % (course_id))
         try:
             a = Assignment.objects.get(Course=c, UniqueString=uniqueString)
             messages.info(self.request, 'Assigment already exists. Updating.')
         except:
-            messages.info(self.request, 'Assigment doesnt exists. Creating.')
+            messages.info(self.request, 'Assigment does not exists. Creating.')
             a = Assignment(Course=c, Title=settings['ASSIGNMENT_TITLE'])
         a.Title = settings['ASSIGNMENT_TITLE']
         activation_date = settings['ACTIVATION_DATE']
@@ -114,7 +114,7 @@ class UploadAssignmentView(TemplateView):
             except:
                 # Exercise does not exist: create it
                 e = Exercise(Assignment=a, Description=ex_setting['SHORT_DESCRIPTION'], Number=ordinal_number)
-                messages.info(self.request, 'Exercise %s doesnt exists. Creating.' % str(e.id))
+                messages.info(self.request, 'Exercise %s does not exists. Creating.' % str(e.Description))
             e.Description = ex_setting['SHORT_DESCRIPTION']
             e.Points = ex_setting['POINTS']
             e.Group = ex_setting['GROUP']
