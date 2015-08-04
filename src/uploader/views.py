@@ -85,6 +85,8 @@ class UploadAssignmentView(TemplateView):
         hard_date = settings['HARD_DATE']
         if ('DUE_DATE' in settings.keys()):
             due_date = settings['DUE_DATE']
+        else:
+            due_date = False
         penalty_percent = settings['PENALTY_PERCENT']
 
         if activation_date:
