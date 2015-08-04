@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Salvatore Zaza
 # @Date:   2015-08-02 18:38:54
-# @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-08-03 14:51:54
+# @Last Modified by:   Elena Graverini
+# @Last Modified time: 2015-08-04 18:12:18
 
 from django.db import models
 # Create your models here.
@@ -120,6 +120,8 @@ class Assignment(models.Model):
         return '%s' % (self.Title)
 
     def is_active(self):
+        if not self.Activation_date:
+            return False
         return date.today() >= self.Activation_date
 
     def is_closed(self):
