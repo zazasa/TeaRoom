@@ -57,6 +57,8 @@
                         Status: 
                         {% if  assignment.is_active %}
                             Active
+                        {% elif not assignment.Activation_date %}     
+                            Inactive, please set activation date
                         {% else %}     
                             will be activated in date {{assignment.Activation_date}}
                         {% endif %} 
