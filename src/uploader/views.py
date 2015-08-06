@@ -16,7 +16,7 @@ import pickle
 from courses.models import Course, Assignment, Exercise, UserFile, Result
 from py_compile import compile
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from datetime import datetime
+from datetime import datetime, date
 import binascii
 from django.http import HttpResponse, HttpResponseNotFound
 import traceback
@@ -94,6 +94,8 @@ class UploadAssignmentView(TemplateView):
 
         if activation_date:
             a.Activation_date = activation_date
+        else:
+            a.Activation_date = date.today()  # TO CHANGE AFTER DEBUG
         if due_date:
             a.Due_date = due_date
             if penalty_percent:
