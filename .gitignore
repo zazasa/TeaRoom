@@ -55,3 +55,6 @@ tramp
 # Windows
 Thumbs.db
 Desktop.ini
+
+# User data
+**/USER_DATA/*
