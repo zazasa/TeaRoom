@@ -274,7 +274,7 @@ class AssignmentListView(LoginRequiredMixin, ListView):
                     selected_course = courses_list[0]
             else:
                 selected_course = courses_list[0]
-            assignment_list = Assignment.objects.filter(Course=selected_course, Activation_date__lte=datetime.datetime.now())
+            assignment_list = Assignment.objects.filter(Course=selected_course, Activation_date__lte=datetime.now())
             exercise_list = self.request.user.exercise_set.all()
             result_list = self._get_result_list(exercise_list)
             context['assignments'] = assignment_list
