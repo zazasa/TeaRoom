@@ -3,7 +3,7 @@
 # @Author: Salvatore Zaza
 # @Date:   2015-08-02 18:38:54
 # @Last Modified by:   Elena Graverini
-# @Last Modified time: 2015-08-04 18:12:18
+# @Last Modified time: 2015-08-06 17:25:29
 
 from django.db import models
 # Create your models here.
@@ -125,6 +125,8 @@ class Assignment(models.Model):
         return date.today() >= self.Activation_date
 
     def is_closed(self):
+        if not self.Hard_date:
+            return False
         return self.Hard_date <= timezone.now()
 
     def has_due_date(self):
