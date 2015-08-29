@@ -1,12 +1,12 @@
-SUBMIT_KEY = 634909078611559151379049143889574228 
+SUBMIT_KEY = 2115056530618012647284667163128333275066817157457429752641 
 FILES_TO_COMPLETE = [u'compute_mean_std.py'] 
-EXERCISE_ID = 8 
+EXERCISE_ID = 16 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: salvo
 # @Date:   2015-05-22 14:03:30
-# @Last Modified by:   salvo
-# @Last Modified time: 2015-05-24 18:46:25
+# @Last Modified by:   Salvatore Zaza
+# @Last Modified time: 2015-08-29 12:01:35
 
 from os.path import join, dirname
 from os import remove
@@ -96,6 +96,7 @@ def download_and_execute_test(auth_data):
             print err
             return False
         else:
+            print 'Test result: \n %s' % str(out)
             return out
     else:
         print r.text

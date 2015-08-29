@@ -178,7 +178,7 @@ class AssignmentListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListVi
         return self._get_students([e])
 
     def _change_date(self, assignment_id, first_date, second_date, use_penalty, penalty_percent):
-        print '_change_date'
+        print '_change_date: %s %s %s %s' %(first_date, second_date, use_penalty, penalty_percent)
         first_date = datetime.strptime(first_date[:-6], '%Y-%m-%dT%H:%M:%S')
         if second_date:
             second_date = datetime.strptime(second_date[:-6], '%Y-%m-%dT%H:%M:%S')
@@ -192,11 +192,20 @@ class AssignmentListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListVi
             a.Penalty_percent = penalty_percent
             a.save()
         else:
+            print 'Second case'
             a.Hard_date = first_date
+            a.Penalty_percent = 0
             a.Due_date = first_date
             a.save()
         print 'worked'
         return {'hard_date': str(a.Hard_date.strftime('%B %d, %H:%M')), 'due_date': str(a.Due_date.strftime('%B %d, %H:%M')), 'penalty_percent': str(a.Penalty_percent), 'use_penalty': str(a.has_due_date())}
+
+    def _change_activation(self, assignment_id, activation_date):
+        activation_date = datetime.strptime(activation_date[:-6], '%Y-%m-%dT%H:%M:%S')
+        a = Assignment.objects.get(id=assignment_id)
+        a.Activation_date = activation_date
+        a.save()
+        return {'activation_date': str(a.Activation_date.strftime('%B %d, %Y')), 'is_active': str(a.is_active())}
 
     def post(self, request):
         response_data = {}
@@ -215,6 +224,14 @@ class AssignmentListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListVi
                 print updated_assignment
                 response_data['updated_assignment'] = updated_assignment
                 response_data['result'] = 'Data change successfull!'
+            elif action == 'change-activation':
+                assignment_id = self.request.POST.get('assignment_id') or False
+                activation_date = self.request.POST.get('activation_date') or False
+                print assignment_id, activation_date
+                if assignment_id and activation_date:
+                    updated_activation = self._change_activation(assignment_id, activation_date)
+                    response_data['updated_activation'] = updated_activation
+                    response_data['result'] = 'Data change successfull!'
             elif action == 'add':
                 exercise_id = self.request.POST.get('ex_id') or False
                 students_id = self.request.POST.get('students_id') or False
@@ -229,7 +246,7 @@ class AssignmentListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListVi
                 student_id = self.request.POST.get('student_id') or False
                 if exercise_id and student_id:
                     exercise_id = int(exercise_id)
-                    students_id = int(students_id)
+                    students_id = int(student_id)
                     exercise_list = self._remove_student(exercise_id, student_id)
                     response_data['exercise_list'] = exercise_list
                     response_data['result'] = 'Student removing successfull!'

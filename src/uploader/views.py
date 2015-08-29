@@ -85,17 +85,24 @@ class UploadAssignmentView(TemplateView):
         hard_date = settings['HARD_DATE']
         if ('DUE_DATE' in settings.keys()):
             due_date = settings['DUE_DATE']
+        else:
+            due_date = False
         penalty_percent = settings['PENALTY_PERCENT']
+
+        if not penalty_percent:
+            penalty_percent = 0
 
         if activation_date:
             a.Activation_date = activation_date
-        if due_date:
-            a.Due_date = due_date
-            if penalty_percent:
-                a.Penalty_percent = penalty_percent
+            
         if hard_date:
             a.Hard_date = hard_date
+            a.Due_date = hard_date
+            a.Penalty_percent = penalty_percent
 
+        if due_date:
+            a.Due_date = due_date
+            a.Penalty_percent = penalty_percent
         a.save()
         return a
 
@@ -108,8 +115,8 @@ class UploadAssignmentView(TemplateView):
                 messages.info(self.request, 'Exercise %s already exists. Updating.' % str(e.id))
             except:
                 # Exercise does not exist: create it
-                e = Exercise(Assignment=a, Description=ex_setting['SHORT_DESCRIPTION'], Number=ordinal_number)
-                messages.info(self.request, 'Exercise %s doesnt exists. Creating.' % str(e.id))
+                e = Exercise(Assignment=a, Number=ordinal_number)
+                messages.info(self.request, 'Exercise %s doesnt exists. Creating.' % str(ordinal_number))
             e.Description = ex_setting['SHORT_DESCRIPTION']
             e.Points = ex_setting['POINTS']
             e.Group = ex_setting['GROUP']
@@ -127,6 +134,7 @@ class UploadAssignmentView(TemplateView):
             except MultipleObjectsReturned as exc:
                 raise Exception(exc)
             except:
+                print "Unhandled error"
                 pass
 
             if isdir(dest_user_files): rmtree(dest_user_files)
