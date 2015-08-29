@@ -2,13 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Salvatore Zaza
 # @Date:   2015-08-02 18:38:54
-<<<<<<< HEAD
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-08-29 16:25:55
-=======
-# @Last Modified by:   Elena Graverini
-# @Last Modified time: 2015-08-06 17:25:29
->>>>>>> 9b208a8267e52e952c392b3e2965b7913dfcc09e
+# @Last Modified time: 2015-08-29 16:27:07
 
 from django.db import models
 # Create your models here.
