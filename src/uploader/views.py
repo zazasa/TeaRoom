@@ -16,7 +16,7 @@ import pickle
 from courses.models import Course, Assignment, Exercise, UserFile, Result
 from py_compile import compile
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from datetime import datetime
+from datetime import datetime, date
 import binascii
 from django.http import HttpResponse, HttpResponseNotFound
 import traceback
@@ -73,12 +73,12 @@ class UploadAssignmentView(TemplateView):
         uniqueString = settings['ASSIGNMENT_TITLE'].strip().upper()
         c = Course.objects.get(id=course_id)
         if not c:
-            raise Exception('Course with id %s doesnt exist.' % (course_id))
+            raise Exception('Course with id %s does not exist.' % (course_id))
         try:
             a = Assignment.objects.get(Course=c, UniqueString=uniqueString)
             messages.info(self.request, 'Assigment already exists. Updating.')
         except:
-            messages.info(self.request, 'Assigment doesnt exists. Creating.')
+            messages.info(self.request, 'Assigment does not exists. Creating.')
             a = Assignment(Course=c, Title=settings['ASSIGNMENT_TITLE'])
         a.Title = settings['ASSIGNMENT_TITLE']
         activation_date = settings['ACTIVATION_DATE']
@@ -87,14 +87,18 @@ class UploadAssignmentView(TemplateView):
             due_date = settings['DUE_DATE']
         else:
             due_date = False
-        penalty_percent = settings['PENALTY_PERCENT']
+
+        if ('PENALTY_PERCENT' in settings.keys()):
+            penalty_percent = settings['PENALTY_PERCENT']
+        else:
+            penalty_percent = 0
 
         if not penalty_percent:
             penalty_percent = 0
 
         if activation_date:
             a.Activation_date = activation_date
-            
+
         if hard_date:
             a.Hard_date = hard_date
             a.Due_date = hard_date
@@ -116,7 +120,8 @@ class UploadAssignmentView(TemplateView):
             except:
                 # Exercise does not exist: create it
                 e = Exercise(Assignment=a, Number=ordinal_number)
-                messages.info(self.request, 'Exercise %s doesnt exists. Creating.' % str(ordinal_number))
+                messages.info(self.request, 'Exercise %s doesnt exists. Creating.' % str(e.Description))
+
             e.Description = ex_setting['SHORT_DESCRIPTION']
             e.Points = ex_setting['POINTS']
             e.Group = ex_setting['GROUP']
@@ -180,7 +185,7 @@ class UploadAssignmentView(TemplateView):
 
 def make_tarfile(output_filename, source_dir, folder_name):
     with tarfile.open(output_filename, "w:gz") as tar:
-        #tar.add(source_dir, arcname=path.basename(source_dir))
+        # tar.add(source_dir, arcname=path.basename(source_dir))
         tar.add(source_dir, arcname=folder_name)
 
 

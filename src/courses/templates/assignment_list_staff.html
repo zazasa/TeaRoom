@@ -62,7 +62,7 @@
                             {% if assignment.Activation_date %}
                                 will be activated in date {{assignment.Activation_date|date:"F j, Y"}}
                             {% else %}    
-                                no activation date
+                                Inactive, please set activation date
                             {% endif %}
                         {% endif %}     
                         </span>
@@ -102,7 +102,7 @@
                                     <div class="list-group">
                                         <div class="ex-header list-group-item list-group-item-info clearfix">
                                             <div class='col-xs-6'>
-                                                <h4 class="list-group-item-heading ">{{exercise.Description}}</h4>
+                                                <h4 class="list-group-item-heading ">{{exercise.Description}} {{exercise.Number}}</h4>
                                             </div>
                                             <div class='col-xs-6'>
                                                 <div class='list-group-item-text pull-right'>

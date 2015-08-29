@@ -28,6 +28,7 @@ Do one of the following (I think the second):
     export DJANGO_SETTINGS_MODULE=TeaRoom.settings.production
 - In TeaRoom/src/TeaRoom/wsgi.py at line 11, change TeaRoom.settings to TeaRoom.settings.production
 - remove development.py and import production.py instead (from settings.__init__.py)
+- in assignment_uploader.py, change URL.
 Then:
 - check if templates 404 and 500 exist / work; if not, create them.
 - AoB????
