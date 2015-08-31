@@ -18,7 +18,7 @@ from django.http import Http404
 import json
 import traceback
 from datetime import datetime
-
+from itertools import cycle
 
 class CourseListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListView):
     model = Course
@@ -207,6 +207,19 @@ class AssignmentListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListVi
         a.save()
         return {'activation_date': str(a.Activation_date.strftime('%B %d, %Y')), 'is_active': str(a.is_active())}
 
+    def _autoshuffle(self, assignment_id, user):
+        a = Assignment.objects.get(id=assignment_id)
+        grouplist = a.exercise_set.values('Group').distinct()
+        for group in grouplist:
+            es = a.exercise_set.filter(Group=group['Group']).order_by('?')
+            Assigned.objects.filter(Exercise__in=es).delete()
+            exercise_set = cycle(es)
+            student_set = a.Course.Students.all().order_by('?')
+            for student in student_set:
+                ad = Assigned(Student=student, Exercise=exercise_set.next(), Assigned_by=user)
+                ad.save()
+        return self._get_students(es)
+
     def post(self, request):
         response_data = {}
         user = self.request.user
@@ -221,13 +234,17 @@ class AssignmentListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListVi
                 use_penalty = self.request.POST.get('use_penalty') or False
                 penalty_percent = self.request.POST.get('penalty_percent') or False
                 updated_assignment = self._change_date(assignment_id, first_date, second_date, use_penalty, penalty_percent)
-                print updated_assignment
                 response_data['updated_assignment'] = updated_assignment
                 response_data['result'] = 'Data change successfull!'
+            elif action == 'autoshuffle':
+                assignment_id = self.request.POST.get('assignment_id') or False
+                if assignment_id:
+                    exercise_list = self._autoshuffle(assignment_id, user)
+                    response_data['exercise_list'] = exercise_list
+                    response_data['result'] = 'Data change successfull!'
             elif action == 'change-activation':
                 assignment_id = self.request.POST.get('assignment_id') or False
                 activation_date = self.request.POST.get('activation_date') or False
-                print assignment_id, activation_date
                 if assignment_id and activation_date:
                     updated_activation = self._change_activation(assignment_id, activation_date)
                     response_data['updated_activation'] = updated_activation

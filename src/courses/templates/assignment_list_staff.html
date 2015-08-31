@@ -76,7 +76,7 @@
                     </div>
                     <div class="col-xs-6">
                     <div class="row">
-                    <button class="pull-right auto-shuffle-btn btn btn-sm btn-primary" assignment-id="{{assignment.id}}">
+                    <button class="pull-right autoshuffle-btn btn btn-sm btn-primary" assignment-id="{{assignment.id}}" assignment-title="{{assignment.Title}}">
                     <span>Auto Shuffle</span></button>     
                     </div>
                     <br>
@@ -292,6 +292,28 @@
 </div><!-- /.modal -->
 
 
+<div class="modal fade" id="autoshuffle-modal">
+    <div class="modal-dialog">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Autoshuffle exercise for: <span id='assignment-title'></span></h3>
+        </div>
+        <div class="panel-body">
+            <p class='hidden' id='assignment-id'></p>
+            Are you sure ?
+
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-primary" id='autoshuffle-submit' data-dismiss="modal">Continue</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Abort</button>
+            </div>
+        </div>
+    </div>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
 {% endblock container %}
 
 
@@ -321,6 +343,48 @@
         trigger: $(".add-students-btn"),
     });
     $('#slider-panel').removeClass('hidden');
+
+// aut shuffle methods
+
+
+    $('.autoshuffle-btn').on('click', function(e){
+        // var $form=$(this).closest('form');
+        // e.preventDefault();
+        var assignment_id = $(e.currentTarget).attr("assignment-id");
+        var assignment_title = $(e.currentTarget).attr("assignment-title");
+        
+        $('#autoshuffle-modal').find('#assignment-id').text(assignment_id);
+        $('#autoshuffle-modal').find('#assignment-title').text(assignment_title);
+        $('#autoshuffle-modal').modal()
+    });
+
+
+    $('#autoshuffle-submit').on('click', function(e){    
+        console.log('autoshuffle')
+        var assignment_id = $('#autoshuffle-modal').find('#assignment-id').text();
+
+        $.ajax({
+            url : "/assignment-list-staff/", // the endpoint
+            type : "POST", // http method
+            data : { 
+                action:'autoshuffle',
+                assignment_id: assignment_id,
+            }, // data sent with the post request
+
+            // handle a successful response
+            success : function(json) {
+                update_exercise(json.exercise_list)
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log('NO WAY')
+                // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+
+    });
+
 
 // set activation methids
 
@@ -499,9 +563,6 @@
 
         exercise_list.forEach(function(item){
             var content = '';
-            console.log(item)
-            console.log($('#exercise-table-'+item.exercise_id+' table tbody'))
-            
             ex_table = $('#exercise-table-'+item.exercise_id+' table tbody');
             if(!item.student_list.length){
                 $('#exercise-table-'+item.exercise_id).addClass('hidden');
@@ -511,7 +572,6 @@
             $('#exercise-table-'+item.exercise_id).next('.empty-string').addClass('hidden');    
             }
             item.student_list.forEach(function(student){
-                console.log(student)
                 content+='<tr>';
                 content+='<td>'+student.student+'</td>';
                 content+='<td>'+student.result+'</td>';
@@ -537,12 +597,8 @@
 
 
     $('body').on('click','.student-rem', function(e) {
-        console.log('click')
-        console.log($(this).attr('exercise-id'))
-        console.log($(this).attr('student-id'))
         var ex_id = $(this).attr('exercise-id');
         var student_id = $(this).attr('student-id');
-        console.log(ex_id, student_id)
 
         $.ajax({
             url : "/assignment-list-staff/", // the endpoint
