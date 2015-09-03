@@ -55,13 +55,18 @@
                     <div class="col-xs-6">
                     <p class="list-group-item-text">
                         Status: 
+                        <span class="ad-info" assignment-activation-date="{{assignment.Activation_date}}">
                         {% if  assignment.is_active %}
-                            Active
-                        {% elif not assignment.Activation_date %}     
-                            Inactive, please set activation date
+                            Active since {{assignment.Activation_date|date:"F j, Y"}}
                         {% else %}     
-                            will be activated in date {{assignment.Activation_date}}
-                        {% endif %} 
+                            {% if assignment.Activation_date %}
+                                will be activated in date {{assignment.Activation_date|date:"F j, Y"}}
+                            {% else %}    
+                                Inactive, please set activation date
+                            {% endif %}
+                        {% endif %}     
+                        </span>
+                        
                     </p>
                     <p class="list-group-item-text {% if  assignment.Hard_date == assignment.Due_date %}hidden{% endif %}"> 
                     Due Date: <span class='dd-info'>{{assignment.Due_date|date:"F j, H:i"}}</span></p>    
@@ -71,14 +76,21 @@
                     </div>
                     <div class="col-xs-6">
                     <div class="row">
-                    <button class="pull-right auto-shuffle-btn btn btn-sm btn-primary" assignment-id="{{assignment.id}}">
+                    <button class="pull-right autoshuffle-btn btn btn-sm btn-primary" assignment-id="{{assignment.id}}" assignment-title="{{assignment.Title}}">
                     <span>Auto Shuffle</span></button>     
                     </div>
                     <br>
-                    <div class="row">
-                    <button class="pull-right change-date-btn btn btn-sm btn-primary" 
+                    <div class="row pull-right ">
+                    <button class="change-activation-btn btn btn-sm btn-primary" 
+                        assignment-id="{{assignment.id}}" assignment-title="{{assignment.Title}}" assignment-activation-date="{{assignment.Activation_date|date:'c'}}">
+                    <span>Activation date</span></button>
+
+                    <button class="change-date-btn btn btn-sm btn-primary" 
                         assignment-id="{{assignment.id}}" assignment-title="{{assignment.Title}}" assignment-hard-date="{{assignment.Hard_date|date:'c'}}">
                     <span>Change Deadline</span></button> 
+
+
+
                     </div>
                     </div>
                     </fieldset>
@@ -204,6 +216,7 @@
     </div> 
 </div> 
 
+
 <div class="modal fade" id="change-deadline-modal">
     <div class="modal-dialog">
     <div class="panel panel-primary">
@@ -251,6 +264,55 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div class="modal fade" id="change-activation-modal">
+    <div class="modal-dialog">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Select activation date for: <span id='assignment-title'></span></h3>
+        </div>
+        <div class="panel-body">
+            <p class='hidden' id='assignment-id'></p>
+            <form action="" method="POST" class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label for="first-date" class="col-sm-2 control-label">Activation Date</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="activation-date">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-primary" id='change-activation-submit' data-dismiss="modal">Submit</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Abort</button>
+            </div>
+        </div>
+    </div>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<div class="modal fade" id="autoshuffle-modal">
+    <div class="modal-dialog">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Autoshuffle exercise for: <span id='assignment-title'></span></h3>
+        </div>
+        <div class="panel-body">
+            <p class='hidden' id='assignment-id'></p>
+            Are you sure ?
+
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="btn-group pull-right">
+                <button type="button" class="btn btn-primary" id='autoshuffle-submit' data-dismiss="modal">Continue</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Abort</button>
+            </div>
+        </div>
+    </div>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 
 {% endblock container %}
 
@@ -282,7 +344,119 @@
     });
     $('#slider-panel').removeClass('hidden');
 
+// aut shuffle methods
 
+
+    $('.autoshuffle-btn').on('click', function(e){
+        // var $form=$(this).closest('form');
+        // e.preventDefault();
+        var assignment_id = $(e.currentTarget).attr("assignment-id");
+        var assignment_title = $(e.currentTarget).attr("assignment-title");
+        
+        $('#autoshuffle-modal').find('#assignment-id').text(assignment_id);
+        $('#autoshuffle-modal').find('#assignment-title').text(assignment_title);
+        $('#autoshuffle-modal').modal()
+    });
+
+
+    $('#autoshuffle-submit').on('click', function(e){    
+        console.log('autoshuffle')
+        var assignment_id = $('#autoshuffle-modal').find('#assignment-id').text();
+
+        $.ajax({
+            url : "/assignment-list-staff/", // the endpoint
+            type : "POST", // http method
+            data : { 
+                action:'autoshuffle',
+                assignment_id: assignment_id,
+            }, // data sent with the post request
+
+            // handle a successful response
+            success : function(json) {
+                update_exercise(json.exercise_list)
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log('NO WAY')
+                // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+
+    });
+
+
+// set activation methids
+
+    $('#change-activation-submit').on('click', function(e){    
+        var activation_date = $('#activation-date').data("DateTimePicker").viewDate().format()
+        var assignment_id = $('#change-activation-modal').find('#assignment-id').text();
+
+        $.ajax({
+            url : "/assignment-list-staff/", // the endpoint
+            type : "POST", // http method
+            data : { 
+                action:'change-activation',
+                assignment_id: assignment_id,
+                activation_date: activation_date,
+            }, // data sent with the post request
+
+            // handle a successful response
+            success : function(json) {
+                update_activation(assignment_id,json.updated_activation)
+                // console.log("success"); // another sanity check
+                // update_exercise(json.exercise_list)
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log('NO WAY')
+                // console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+
+    });
+
+    $('.change-activation-btn').on('click', function(e){
+        // var $form=$(this).closest('form');
+        // e.preventDefault();
+        var assignment_title = $(e.currentTarget).attr("assignment-title");
+        var assignment_id = $(e.currentTarget).attr("assignment-id");
+        var assignment_activation_date = $(e.currentTarget).attr("assignment-activation-date");
+        
+        if (!assignment_activation_date){
+            assignment_activation_date = moment()
+        }
+
+        // check if there is no hard date set in assignment !! BUG!!!
+        if ($('#activation-date').data("DateTimePicker")){
+            $('#activation-date').val("")
+            $('#activation-date').data("DateTimePicker").destroy()
+        }
+        $('#activation-date').datetimepicker({showClose:true, defaultDate:assignment_activation_date, format:"MMMM D, YYYY"});    
+        $('#activation-date').on("dp.change", function (e) { 
+            if ($('#second-date').data("DateTimePicker")){
+                $('#second-date').val("")
+                $('#second-date').data("DateTimePicker").destroy()   
+                $('#second-date').datetimepicker({showClose:true,defaultDate:moment(e.date), minDate:moment(e.date), format:"MMMM D, YYYY"});
+            }
+        })
+        
+        $('#change-activation-modal').find('#assignment-title').text(assignment_title);
+        $('#change-activation-modal').find('#assignment-id').text(assignment_id);
+        $('#change-activation-modal').modal()
+    });
+
+    function update_activation(assignment_id, info){
+        var outstring = "";
+        if (info.is_active == "True"){
+            outstring = "Active since "+info.activation_date
+        }
+        else {
+            outstring = "will be activated in date "+info.activation_date
+        }
+        $('#detail-'+assignment_id).find('.ad-info').text(outstring)
+    }
 
 
 // set deadline js methods
@@ -306,6 +480,7 @@
         var penalty_percent = $('#penalty-percent').val().toString();
         var assignment_id = $('#change-deadline-modal').find('#assignment-id').text();
 
+        console.log("second_date" + second_date)
         $.ajax({
             url : "/assignment-list-staff/", // the endpoint
             type : "POST", // http method
@@ -355,6 +530,12 @@
         var assignment_title = $(e.currentTarget).attr("assignment-title");
         var assignment_id = $(e.currentTarget).attr("assignment-id");
         var assignment_hard_date = $(e.currentTarget).attr("assignment-hard-date");
+        
+        if (!assignment_hard_date){
+            assignment_hard_date = moment()
+        }
+        console.log(assignment_hard_date)
+        // check if there is no hard date set in assignment !! BUG!!!
         if ($('#first-date').data("DateTimePicker")){
             $('#first-date').val("")
             $('#first-date').data("DateTimePicker").destroy()
@@ -382,9 +563,6 @@
 
         exercise_list.forEach(function(item){
             var content = '';
-            console.log(item)
-            console.log($('#exercise-table-'+item.exercise_id+' table tbody'))
-            
             ex_table = $('#exercise-table-'+item.exercise_id+' table tbody');
             if(!item.student_list.length){
                 $('#exercise-table-'+item.exercise_id).addClass('hidden');
@@ -394,7 +572,6 @@
             $('#exercise-table-'+item.exercise_id).next('.empty-string').addClass('hidden');    
             }
             item.student_list.forEach(function(student){
-                console.log(student)
                 content+='<tr>';
                 content+='<td>'+student.student+'</td>';
                 content+='<td>'+student.result+'</td>';
@@ -420,12 +597,8 @@
 
 
     $('body').on('click','.student-rem', function(e) {
-        console.log('click')
-        console.log($(this).attr('exercise-id'))
-        console.log($(this).attr('student-id'))
         var ex_id = $(this).attr('exercise-id');
         var student_id = $(this).attr('student-id');
-        console.log(ex_id, student_id)
 
         $.ajax({
             url : "/assignment-list-staff/", // the endpoint
