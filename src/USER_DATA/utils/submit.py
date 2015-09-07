@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: salvo
 # @Date:   2015-05-22 14:03:30
-# @Last Modified by:   salvo
-# @Last Modified time: 2015-05-24 18:46:25
+# @Last Modified by:   Elena Graverini
+# @Last Modified time: 2015-08-06 18:13:25
 
 from os.path import join, dirname
 from os import remove

@@ -116,7 +116,7 @@ class UploadAssignmentView(TemplateView):
             except:
                 # Exercise does not exist: create it
                 e = Exercise(Assignment=a, Description=ex_setting['SHORT_DESCRIPTION'], Number=ordinal_number)
-                messages.info(self.request, 'Exercise %s does not exists. Creating.' % str(e.Description))
+                messages.info(self.request, 'Exercise %s %s does not exist. Creating.' % (str(e.Description), str(e.Number)))
             e.Description = ex_setting['SHORT_DESCRIPTION']
             e.Points = ex_setting['POINTS']
             e.Group = ex_setting['GROUP']
@@ -166,7 +166,7 @@ class UploadAssignmentView(TemplateView):
             data = "SUBMIT_KEY = %s \n" % str(int(binascii.hexlify(str(e.Submit_key)), 16)) + data
             modified.write(data)
         compile(destination_file, doraise=True)
-        # remove(destination_file)
+        remove(destination_file)
 
     def create_user_package(self, e, dest_user_files, ex_folder, package_name):
         # Save to disk
