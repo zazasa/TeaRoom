@@ -59,3 +59,7 @@ Desktop.ini
 # User data
 **/USER_DATA/temp/*
 **/USER_DATA/courses/*
+
+# Deploy statics
+#**/DEPLOY_STATIC/*
+#**/DEPLOY_STATIC/**/*
