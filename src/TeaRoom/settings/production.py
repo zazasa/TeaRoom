@@ -14,4 +14,6 @@ SEND_BROKEN_LINK_EMAILS = True
 MANAGERS = ADMINS
 ALLOWED_HOSTS = [
     'marder.physik.uzh.ch',
+    'marder',
 ]
+##STATIC_ROOT = join(BASE_DIR, 'static')
