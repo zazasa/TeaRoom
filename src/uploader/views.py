@@ -87,22 +87,26 @@ class UploadAssignmentView(TemplateView):
             due_date = settings['DUE_DATE']
         else:
             due_date = False
+
         if ('PENALTY_PERCENT' in settings.keys()):
             penalty_percent = settings['PENALTY_PERCENT']
         else:
-            penalty_percent = False
+            penalty_percent = 0
+
+        if not penalty_percent:
+            penalty_percent = 0
 
         if activation_date:
             a.Activation_date = activation_date
-        else:
-            a.Activation_date = date.today()  # TO CHANGE AFTER DEBUG
-        if due_date:
-            a.Due_date = due_date
-            if penalty_percent:
-                a.Penalty_percent = penalty_percent
+
         if hard_date:
             a.Hard_date = hard_date
+            a.Due_date = hard_date
+            a.Penalty_percent = penalty_percent
 
+        if due_date:
+            a.Due_date = due_date
+            a.Penalty_percent = penalty_percent
         a.save()
         return a
 
@@ -115,8 +119,10 @@ class UploadAssignmentView(TemplateView):
                 messages.info(self.request, 'Exercise %s already exists. Updating.' % str(e.id))
             except:
                 # Exercise does not exist: create it
-                e = Exercise(Assignment=a, Description=ex_setting['SHORT_DESCRIPTION'], Number=ordinal_number)
-                messages.info(self.request, 'Exercise %s %s does not exist. Creating.' % (str(e.Description), str(e.Number)))
+
+                e = Exercise(Assignment=a, Number=ordinal_number)
+                messages.info(self.request, 'Exercise %s doesnt exists. Creating.' % str(e.Description))
+
             e.Description = ex_setting['SHORT_DESCRIPTION']
             e.Points = ex_setting['POINTS']
             e.Group = ex_setting['GROUP']
@@ -134,6 +140,7 @@ class UploadAssignmentView(TemplateView):
             except MultipleObjectsReturned as exc:
                 raise Exception(exc)
             except:
+                print "Unhandled error"
                 pass
 
             if isdir(dest_user_files): rmtree(dest_user_files)
@@ -179,7 +186,7 @@ class UploadAssignmentView(TemplateView):
 
 def make_tarfile(output_filename, source_dir, folder_name):
     with tarfile.open(output_filename, "w:gz") as tar:
-        #tar.add(source_dir, arcname=path.basename(source_dir))
+        # tar.add(source_dir, arcname=path.basename(source_dir))
         tar.add(source_dir, arcname=folder_name)
 
 

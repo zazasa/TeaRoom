@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: salvo
 # @Date:   2015-05-22 14:03:30
-# @Last Modified by:   Elena Graverini
-# @Last Modified time: 2015-08-06 18:13:25
+# @Last Modified by:   Salvatore Zaza
+# @Last Modified time: 2015-08-29 12:01:35
 
 from os.path import join, dirname
 from os import remove
@@ -93,6 +93,7 @@ def download_and_execute_test(auth_data):
             print err
             return False
         else:
+            print 'Test result: \n %s' % str(out)
             return out
     else:
         print r.text

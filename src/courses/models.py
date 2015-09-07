@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Salvatore Zaza
 # @Date:   2015-08-02 18:38:54
-# @Last Modified by:   Elena Graverini
-# @Last Modified time: 2015-08-06 17:25:29
+# @Last Modified by:   Salvatore Zaza
+# @Last Modified time: 2015-08-29 16:27:07
 
 from django.db import models
 # Create your models here.
@@ -120,14 +120,10 @@ class Assignment(models.Model):
         return '%s' % (self.Title)
 
     def is_active(self):
-        if not self.Activation_date:
-            return False
-        return date.today() >= self.Activation_date
+        return self.Activation_date and date.today() >= self.Activation_date
 
     def is_closed(self):
-        if not self.Hard_date:
-            return False
-        return self.Hard_date <= timezone.now()
+        return (not self.Hard_date) and self.Hard_date <= timezone.now()
 
     def has_due_date(self):
         return self.Hard_date and (self.Hard_date != self.Due_date)
@@ -135,7 +131,7 @@ class Assignment(models.Model):
     def clean(self, *args, **kwargs):
         # add custom validation here
         if self.Due_date:
-            if not self.Penalty_percent:
+            if self.Penalty_percent is None:
                 raise ValidationError('Due date withouth penalty percent')
         # call default cleaning
         super(Assignment, self).clean(*args, **kwargs)
