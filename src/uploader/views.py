@@ -119,6 +119,7 @@ class UploadAssignmentView(TemplateView):
                 messages.info(self.request, 'Exercise %s already exists. Updating.' % str(e.id))
             except:
                 # Exercise does not exist: create it
+
                 e = Exercise(Assignment=a, Number=ordinal_number)
                 messages.info(self.request, 'Exercise %s doesnt exists. Creating.' % str(e.Description))
 
@@ -172,7 +173,7 @@ class UploadAssignmentView(TemplateView):
             data = "SUBMIT_KEY = %s \n" % str(int(binascii.hexlify(str(e.Submit_key)), 16)) + data
             modified.write(data)
         compile(destination_file, doraise=True)
-        # remove(destination_file)
+        remove(destination_file)
 
     def create_user_package(self, e, dest_user_files, ex_folder, package_name):
         # Save to disk
