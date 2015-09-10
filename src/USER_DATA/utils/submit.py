@@ -16,7 +16,7 @@ from subprocess import Popen, PIPE, STDOUT
 
 #URL = 'http://localhost:8000/upload-result/'
 # URL = 'https://%s/upload-result/' % ('SITE_URL')  # to change after the deploy
-URL = 'https://marder.physik.uzh.ch/da/upload-assignment/'
+URL = 'https://marder.physik.uzh.ch/da/upload-result/'
 COOKIE_URL = 'https://marder.physik.uzh.ch/da/'
 
 # FILES_TO_COMPLETE = []
