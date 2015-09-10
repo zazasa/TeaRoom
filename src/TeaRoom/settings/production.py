@@ -15,5 +15,7 @@ MANAGERS = ADMINS
 ALLOWED_HOSTS = [
     'marder.physik.uzh.ch',
     'marder',
+    'da.physik.uzh.ch',
+    'da'
 ]
 ##STATIC_ROOT = join(BASE_DIR, 'static')
