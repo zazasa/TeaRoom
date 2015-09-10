@@ -322,6 +322,8 @@
 <script src="{% static 'site/js/site.js' %}"></script>
 
 <script type="text/javascript">
+    var app_url = location.protocol + '//' + location.host;
+
     $('.selectpicker').selectpicker();
     $('.selectpicker').selectpicker('val', '{{selected_course.id}}');
     $('.selectpicker').on('change', function(){
@@ -364,7 +366,7 @@
         var assignment_id = $('#autoshuffle-modal').find('#assignment-id').text();
 
         $.ajax({
-            url : "/assignment-list-staff/", // the endpoint
+            url : app_url+"{% url 'courses:assignment-list-staff' %}", 
             type : "POST", // http method
             data : { 
                 action:'autoshuffle',
@@ -393,7 +395,7 @@
         var assignment_id = $('#change-activation-modal').find('#assignment-id').text();
 
         $.ajax({
-            url : "/assignment-list-staff/", // the endpoint
+            url : "{% url 'courses:assignment-list-staff' %}", 
             type : "POST", // http method
             data : { 
                 action:'change-activation',
@@ -482,7 +484,7 @@
 
         console.log("second_date" + second_date)
         $.ajax({
-            url : "/assignment-list-staff/", // the endpoint
+            url : "{% url 'courses:assignment-list-staff' %}", 
             type : "POST", // http method
             data : { 
                 action:'change-date',
@@ -601,7 +603,7 @@
         var student_id = $(this).attr('student-id');
 
         $.ajax({
-            url : "/assignment-list-staff/", // the endpoint
+            url : "{% url 'courses:assignment-list-staff' %}", 
             type : "POST", // http method
             data : { 
                 action:'remove',
@@ -636,7 +638,7 @@
         // console.log(ex_id);
 
         $.ajax({
-            url : "/assignment-list-staff/", // the endpoint
+            url : "{% url 'courses:assignment-list-staff' %}", 
             type : "POST", // http method
             data : { 
                 action:'add',
