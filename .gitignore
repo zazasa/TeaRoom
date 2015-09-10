@@ -63,3 +63,7 @@ Desktop.ini
 # Deploy statics
 #**/DEPLOY_STATIC/*
 #**/DEPLOY_STATIC/**/*
+
+# Media
+src/media/*
+src/media/**/*
