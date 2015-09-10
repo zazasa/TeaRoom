@@ -362,7 +362,7 @@
 
 
     $('#autoshuffle-submit').on('click', function(e){    
-        console.log('autoshuffle')
+        // console.log('autoshuffle')
         var assignment_id = $('#autoshuffle-modal').find('#assignment-id').text();
 
         $.ajax({
@@ -395,7 +395,7 @@
         var assignment_id = $('#change-activation-modal').find('#assignment-id').text();
 
         $.ajax({
-            url : "{% url 'courses:assignment-list-staff' %}", 
+            url : app_url+"{% url 'courses:assignment-list-staff' %}", 
             type : "POST", // http method
             data : { 
                 action:'change-activation',
@@ -482,9 +482,9 @@
         var penalty_percent = $('#penalty-percent').val().toString();
         var assignment_id = $('#change-deadline-modal').find('#assignment-id').text();
 
-        console.log("second_date" + second_date)
+        // console.log("second_date" + second_date)
         $.ajax({
-            url : "{% url 'courses:assignment-list-staff' %}", 
+            url : app_url+"{% url 'courses:assignment-list-staff' %}", 
             type : "POST", // http method
             data : { 
                 action:'change-date',
@@ -536,7 +536,7 @@
         if (!assignment_hard_date){
             assignment_hard_date = moment()
         }
-        console.log(assignment_hard_date)
+        // console.log(assignment_hard_date)
         // check if there is no hard date set in assignment !! BUG!!!
         if ($('#first-date').data("DateTimePicker")){
             $('#first-date').val("")
@@ -603,7 +603,7 @@
         var student_id = $(this).attr('student-id');
 
         $.ajax({
-            url : "{% url 'courses:assignment-list-staff' %}", 
+            url : app_url+"{% url 'courses:assignment-list-staff' %}", 
             type : "POST", // http method
             data : { 
                 action:'remove',
@@ -638,7 +638,7 @@
         // console.log(ex_id);
 
         $.ajax({
-            url : "{% url 'courses:assignment-list-staff' %}", 
+            url : app_url+"{% url 'courses:assignment-list-staff' %}", 
             type : "POST", // http method
             data : { 
                 action:'add',
