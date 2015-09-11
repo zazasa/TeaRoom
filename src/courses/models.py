@@ -3,7 +3,7 @@
 # @Author: Salvatore Zaza
 # @Date:   2015-08-02 18:38:54
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-08-29 16:27:07
+# @Last Modified time: 2015-09-11 12:02:21
 
 from django.db import models
 # Create your models here.
@@ -119,11 +119,14 @@ class Assignment(models.Model):
     def __str__(self):
         return '%s' % (self.Title)
 
+    def is_wellformed(self):
+        return self.Activation_date and self.Hard_date
+
     def is_active(self):
         return self.Activation_date and date.today() >= self.Activation_date
 
     def is_closed(self):
-        return (not self.Hard_date) and self.Hard_date <= timezone.now()
+        return self.Hard_date and self.Hard_date <= timezone.now()
 
     def has_due_date(self):
         return self.Hard_date and (self.Hard_date != self.Due_date)
