@@ -14,8 +14,10 @@ import sys
 
 from subprocess import Popen, PIPE, STDOUT
 
-URL = 'http://localhost:8000/upload-result/'
+#URL = 'http://localhost:8000/upload-result/'
 # URL = 'https://%s/upload-result/' % ('SITE_URL')  # to change after the deploy
+URL = 'https://marder.physik.uzh.ch/da/upload-result/'
+COOKIE_URL = 'https://marder.physik.uzh.ch/da/'
 
 # FILES_TO_COMPLETE = []
 # EXERCISE_ID = 1
@@ -48,7 +50,8 @@ def upload_package(auth_data, filename):
     s = requests.session()
 
     # get csrftoken from server
-    r = s.get(URL, verify=False)
+    #r = s.get(URL, verify=False)
+    r = s.get(COOKIE_URL, verify=False)
     csrftoken = r.cookies['csrftoken']
     headers = {'X-CSRFToken': csrftoken, 'Referer': URL}
 
@@ -66,10 +69,10 @@ def upload_package(auth_data, filename):
 
 def download_and_execute_test(auth_data):
     s = requests.session()
-    r = s.get(URL, verify=False)
+    #r = s.get(URL, verify=False)
 
     # get csrftoken from server
-    r = s.get(URL, verify=False)
+    r = s.get(COOKIE_URL, verify=False)
     csrftoken = r.cookies['csrftoken']
     headers = {'X-CSRFToken': csrftoken, 'Referer': URL}
 

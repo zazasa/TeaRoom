@@ -6,6 +6,8 @@
 # @Last Modified time: 2015-08-02 18:07:10
 
 from django.contrib import admin
+from django.conf import settings
+
 # Register your models here.
 from .models import *
 
@@ -121,6 +123,9 @@ class ResultAdmin(admin.ModelAdmin):
     list_display = ('User', 'Exercise', 'Creation_date', 'Pass')
     readonly_fields = ('User', 'Exercise', 'Pass', 'Creation_date', 'Parser_output')
         
+
+if settings.ADMIN_SITE_URL:
+    admin.site.site_url = settings.ADMIN_SITE_URL
 
 admin.site.register(Enrolled, EnrolledAdmin)
 admin.site.register(Course, CourseAdmin)

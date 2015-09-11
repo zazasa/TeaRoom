@@ -33,3 +33,10 @@ Then:
 - check if templates 404 and 500 exist / work; if not, create them.
 - AoB????
 
+
+
+- chiedere a roland di cambiare permessi a local.env in modo che apache lo possa usare, ma altri non lo possano leggere
+
+./manage.py flush
+./manage.py makemigrations
+./manage.py syncdb [ creating a superuser ]
