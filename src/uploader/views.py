@@ -196,6 +196,7 @@ class UploadAssignmentView(TemplateView):
         destination_file = join(dest_user_files, 'submit.py')
         with open(original_file, 'rb') as original: data = original.read()
         with open(destination_file, 'wb') as modified:
+            data = "SSL_CERT_URL = %s \n" % str(settings.SSL_CERT_URL) + data
             data = "BASE_URL = %s \n" % str(settings.SITE_URL) + data
             data = "EXERCISE_ID = %s \n" % str(e.id) + data
             data = "FILES_TO_COMPLETE = %s \n" % str(file_list) + data

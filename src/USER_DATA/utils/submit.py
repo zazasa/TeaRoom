@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-22 14:03:30
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-09-11 15:35:55
+# @Last Modified time: 2015-09-11 17:21:10
 
 from os.path import join, dirname
 from os import remove
@@ -14,6 +14,7 @@ import sys
 
 from subprocess import Popen, PIPE, STDOUT
 
+# SSL_CERT_URL="http://localhost:8000/static/CAServerRoot.pem"
 # BASE_URL = 'https://localhost:8000'
 # FILES_TO_COMPLETE = []
 # EXERCISE_ID = 1
@@ -24,6 +25,16 @@ UPLOAD_URL = BASE_URL + "/upload-result/"
 BASEDIR = dirname(__file__)
 
 OUTPUT_FILENAME = 'ex_' + str(EXERCISE_ID) + '.tar.gz'
+
+
+def get_ssl_cert():
+    r = requests.get(SSL_CERT_URL, verify=False)
+    if r.status_code == 200:
+        with open("cert.pem", 'wb') as f:
+            f.write(r.content)
+        return "cert.pem"
+    else:
+        return False
 
 
 def get_user_and_pass():
@@ -44,12 +55,11 @@ def create_package(file_list, out):
             tar.add(filename)
 
 
-def upload_package(auth_data, filename):
+def upload_package(auth_data, filename, verify):
     s = requests.session()
 
     # get csrftoken from server
-    #r = s.get(URL, verify=False)
-    r = s.get(BASE_URL, verify=False)
+    r = s.get(BASE_URL, verify=verify)
     csrftoken = r.cookies['csrftoken']
     headers = {'X-CSRFToken': csrftoken, 'Referer': UPLOAD_URL}
 
@@ -65,12 +75,12 @@ def upload_package(auth_data, filename):
     print r.text
 
 
-def download_and_execute_test(auth_data):
+def download_and_execute_test(auth_data, verify):
     s = requests.session()
     #r = s.get(URL, verify=False)
 
     # get csrftoken from server
-    r = s.get(BASE_URL, verify=False)
+    r = s.get(BASE_URL, verify=verify)
     csrftoken = r.cookies['csrftoken']
     headers = {'X-CSRFToken': csrftoken, 'Referer': UPLOAD_URL}
 
@@ -103,13 +113,15 @@ def download_and_execute_test(auth_data):
 
 if __name__ == '__main__':
     auth_data = get_user_and_pass()
+
+    verify = get_ssl_cert()
     
-    out = download_and_execute_test(auth_data)
+    out = download_and_execute_test(auth_data, verify)
 
     # pack and upload test output
     if out:
         create_package(FILES_TO_COMPLETE, out)
-        upload_package(auth_data, OUTPUT_FILENAME)
+        upload_package(auth_data, OUTPUT_FILENAME, verify)
         # remove test output from user's disk
         remove(OUTPUT_FILENAME)
 

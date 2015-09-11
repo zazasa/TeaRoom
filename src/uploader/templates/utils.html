@@ -17,10 +17,20 @@
 
 {% block container %}
 
-
-<div class="list-group">
-    
-    <a href="{% url 'uploader:download-utils-file' %}?file=assignment_uploader">Download Assignment uploader</a>
+<div>
+<div class="panel panel-primary">
+      <div class="panel-heading">
+            <h3 class="panel-title">Files:</h3>
+      </div>
+      <div class="panel-body">
+      <ul>
+          <li>
+            <a href="{% url 'uploader:download-utils-file' %}?file=assignment_uploader">Download Assignment uploader</a>  
+          </li>
+      </ul>
+            
+      </div>
+</div>
     
 </div>
 

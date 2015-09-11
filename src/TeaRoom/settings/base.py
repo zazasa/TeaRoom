@@ -55,6 +55,7 @@ if exists(env_file):
 
 SITE_URL = env('SITE_URL')
 ADMIN_SITE_URL = env("ADMIN_SITE_URL")
+SSL_CERT_URL = env('SSL_CERT_URL')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
