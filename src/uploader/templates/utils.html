@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load add_get_parameter %} 
+
+{% block title %}{% with 'Utils' as subtitle  %}
+{{ block.super }}
+{% endwith %}{% endblock %}
+
+{% block navbar-left %}
+{% include "_navbar.html" with active_link="Utils" %}
+{% endblock %}
+
+{% block splash %}
+{% endblock splash %}
+
+{% block container %}
+
+
+<div class="list-group">
+    
+    <a href="{% url 'uploader:download-utils-file' %}?file=assignment_uploader">Download Assignment uploader</a>
+    
+</div>
+
+
+{% endblock container %}
+
+
+
+{% block scripts %}
+<script src="{% static 'site/js/site.js' %}"></script>
+
+<script type="text/javascript">
+</script>    
+
+
+{% endblock scripts %}

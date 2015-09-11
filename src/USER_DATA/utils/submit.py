@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-22 14:03:30
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-08-29 12:01:35
+# @Last Modified time: 2015-09-11 15:35:55
 
 from os.path import join, dirname
 from os import remove
@@ -14,14 +14,12 @@ import sys
 
 from subprocess import Popen, PIPE, STDOUT
 
-#URL = 'http://localhost:8000/upload-result/'
-# URL = 'https://%s/upload-result/' % ('SITE_URL')  # to change after the deploy
-URL = 'https://marder.physik.uzh.ch/da/upload-result/'
-COOKIE_URL = 'https://marder.physik.uzh.ch/da/'
-
+# BASE_URL = 'https://localhost:8000'
 # FILES_TO_COMPLETE = []
 # EXERCISE_ID = 1
 # SUBMIT_KEY = 7877143574145281473039462462327
+
+UPLOAD_URL = BASE_URL + "/upload-result/"
 
 BASEDIR = dirname(__file__)
 
@@ -51,9 +49,9 @@ def upload_package(auth_data, filename):
 
     # get csrftoken from server
     #r = s.get(URL, verify=False)
-    r = s.get(COOKIE_URL, verify=False)
+    r = s.get(BASE_URL, verify=False)
     csrftoken = r.cookies['csrftoken']
-    headers = {'X-CSRFToken': csrftoken, 'Referer': URL}
+    headers = {'X-CSRFToken': csrftoken, 'Referer': UPLOAD_URL}
 
     files = {'file': open(filename, 'rb')}
 
@@ -61,7 +59,7 @@ def upload_package(auth_data, filename):
     data['ex_id'] = EXERCISE_ID
     data['type'] = 'upload'
 
-    r = requests.post(URL, data=data, headers=headers, cookies=r.cookies, files=files)
+    r = requests.post(UPLOAD_URL, data=data, headers=headers, cookies=r.cookies, files=files)
 
     # print r.headers
     print r.text
@@ -72,16 +70,16 @@ def download_and_execute_test(auth_data):
     #r = s.get(URL, verify=False)
 
     # get csrftoken from server
-    r = s.get(COOKIE_URL, verify=False)
+    r = s.get(BASE_URL, verify=False)
     csrftoken = r.cookies['csrftoken']
-    headers = {'X-CSRFToken': csrftoken, 'Referer': URL}
+    headers = {'X-CSRFToken': csrftoken, 'Referer': UPLOAD_URL}
 
     data = auth_data
     data['ex_id'] = EXERCISE_ID
     data['type'] = 'download'  # download tests
     
     # post request to server
-    r = requests.post(URL, data=data, headers=headers, cookies=r.cookies)
+    r = requests.post(UPLOAD_URL, data=data, headers=headers, cookies=r.cookies)
     # get either compiled python or other info (e.g. auth errors)
     if r.headers['content-type'] == 'application/x-bytecode.python':
         # open a python subprocess with dedicated stdin/out/err

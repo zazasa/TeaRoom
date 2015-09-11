@@ -21,11 +21,38 @@ import binascii
 from django.http import HttpResponse, HttpResponseNotFound
 import traceback
 from subprocess import Popen, PIPE, STDOUT
-
+from braces.views import LoginRequiredMixin, CsrfExemptMixin, StaffuserRequiredMixin
 from django.utils import timezone
+from django.conf import settings
 
 
 # Create your views here.
+class UtilsView(LoginRequiredMixin, StaffuserRequiredMixin, TemplateView):
+    template_name = "utils.html"
+
+
+class DownloadUtilsFileView(LoginRequiredMixin, StaffuserRequiredMixin, View):
+    def get_assignment_uploader(self):
+        original_file = join(settings.USER_DATA_ROOT, 'utils/assignment_uploader.py')
+        print original_file
+        with open(original_file, 'rb') as original: data = original.read()
+        data = "BASE_URL = %s \n" % str(settings.SITE_URL) + data
+        return data
+
+    def get(self, request, *args, **kwargs):
+        try:
+            file_requested = request.GET.get('file') or False
+            if file_requested == "assignment_uploader":
+                file_to_send = self.get_assignment_uploader()
+                response = HttpResponse(file_to_send, content_type="text/plain")
+                response['Content-Disposition'] = 'attachment; filename=assignment_uploader.py'
+                return response
+            else:
+                raise
+        except:
+            return HttpResponseNotFound('Utils file not found or malformed.')
+
+
 class UploadAssignmentView(TemplateView):
     template_name = "upload_assignment.txt"
     content_type = 'text/plain'
@@ -169,6 +196,7 @@ class UploadAssignmentView(TemplateView):
         destination_file = join(dest_user_files, 'submit.py')
         with open(original_file, 'rb') as original: data = original.read()
         with open(destination_file, 'wb') as modified:
+            data = "BASE_URL = %s \n" % str(settings.SITE_URL) + data
             data = "EXERCISE_ID = %s \n" % str(e.id) + data
             data = "FILES_TO_COMPLETE = %s \n" % str(file_list) + data
             data = "SUBMIT_KEY = %s \n" % str(int(binascii.hexlify(str(e.Submit_key)), 16)) + data

@@ -14,8 +14,8 @@
 <li {% if active_link == "Courses" %}class="active"{% endif %}><a href="{% url 'courses:course-list-staff' %}">Courses</a></li>
 <li {% if active_link == "Assignments" %}class="active"{% endif %}><a href="{% url 'courses:assignment-list-staff' %}">Assignments</a></li>
 <li {% if active_link == "Results" %}class="active"{% endif %}><a href="{% url 'courses:result-list-staff' %}">Results</a></li>
+<li {% if active_link == "Utils" %}class="active"{% endif %}><a href="{% url 'uploader:utils' %}">Utils</a></li>
 {# <li {% if active_link == "Users" %}class="active"{% endif %}><a href="{% url 'courses:user-list-staff' %}">Submit history</a></li> #}
-{# <li {% if active_link == "Help" %}class="active"{% endif %}><a href="{% url 'help' %}">Help</a></li> #}
 {%endif%}
 
 

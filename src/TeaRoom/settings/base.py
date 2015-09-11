@@ -46,8 +46,6 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
 import environ
 env = environ.Env()
 
-#SITE_URL = env('SITE_URL')
-SITE_URL = "http://marder.physik.uzh.ch/da"
 
 # Ideally move env file should be outside the git repo
 # i.e. BASE_DIR.parent.parent
@@ -55,8 +53,8 @@ env_file = join(dirname(__file__), 'local.env')
 if exists(env_file):
     environ.Env.read_env(str(env_file))
 
-
-ADMIN_SITE_URL=env("ADMIN_SITE_URL")
+SITE_URL = env('SITE_URL')
+ADMIN_SITE_URL = env("ADMIN_SITE_URL")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
