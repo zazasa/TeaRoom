@@ -36,7 +36,7 @@ class DownloadUtilsFileView(LoginRequiredMixin, StaffuserRequiredMixin, View):
         original_file = join(settings.USER_DATA_ROOT, 'utils/assignment_uploader.py')
         print original_file
         with open(original_file, 'rb') as original: data = original.read()
-        data = "BASE_URL = %s \n" % str(settings.SITE_URL) + data
+        data = "BASE_URL = \"%s\" \n" % str(settings.SITE_URL) + data
         return data
 
     def get(self, request, *args, **kwargs):
@@ -195,8 +195,8 @@ class UploadAssignmentView(TemplateView):
         destination_file = join(dest_user_files, 'submit.py')
         with open(original_file, 'rb') as original: data = original.read()
         with open(destination_file, 'wb') as modified:
-            data = "SSL_CERT_URL = %s \n" % str(settings.SSL_CERT_URL) + data
-            data = "BASE_URL = %s \n" % str(settings.SITE_URL) + data
+            data = "SSL_CERT_URL = \"%s\" \n" % str(settings.SSL_CERT_URL) + data
+            data = "BASE_URL = \"%s\" \n" % str(settings.SITE_URL) + data
             data = "EXERCISE_ID = %s \n" % str(e.id) + data
             data = "FILES_TO_COMPLETE = %s \n" % str(file_list) + data
             data = "SUBMIT_KEY = %s \n" % str(int(binascii.hexlify(str(e.Submit_key)), 16)) + data
