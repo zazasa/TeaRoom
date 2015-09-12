@@ -52,7 +52,7 @@
               <div class="panel-body">
                     <fieldset class="exgroup-border">
                     <legend class="exgroup-border">Info</legend>
-                    <div class="col-xs-6">
+                    <div class="col-xs-7">
                     <p class="list-group-item-text">
                         Status: 
                         <span class="ad-info" assignment-activation-date="{{assignment.Activation_date}}">
@@ -74,7 +74,7 @@
                     <p class="list-group-item-text {% if  assignment.Hard_date == assignment.Due_date %}hidden{% endif %}"> 
                     Penalty Percent: <span class='pp-info'>{{assignment.Penalty_percent}} </span>%</p>    
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-xs-5">
                     <div class="row">
                     <button class="pull-right autoshuffle-btn btn btn-sm btn-primary" assignment-id="{{assignment.id}}" assignment-title="{{assignment.Title}}">
                     <span>Auto Shuffle</span></button>     
