@@ -156,7 +156,6 @@ class UploadAssignmentView(TemplateView):
             #  Compile test file
             test_file = join(dest_test_files, ex_setting['FILE_TO_TEST'])
             compile(test_file, test_file + 'c', doraise=True)
-
             for filename in ex_setting['FILES_TO_COMPLETE']: e.update_file(filename, 'to_complete')
 
             self.build_submit_script(e, dest_user_files)
