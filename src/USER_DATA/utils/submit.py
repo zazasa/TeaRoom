@@ -89,7 +89,7 @@ def download_and_execute_test(auth_data, verify):
     data['type'] = 'download'  # download tests
     
     # post request to server
-    r = requests.post(UPLOAD_URL, data=data, headers=headers, cookies=r.cookies)
+    r = requests.post(UPLOAD_URL, data=data, headers=headers, cookies=r.cookies, verify=verify)
     # get either compiled python or other info (e.g. auth errors)
     if r.headers['content-type'] == 'application/x-bytecode.python':
         # open a python subprocess with dedicated stdin/out/err
