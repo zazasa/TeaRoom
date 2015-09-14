@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-22 14:03:30
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-09-11 17:21:10
+# @Last Modified time: 2015-09-14 17:28:15
 
 from os.path import join, dirname
 from os import remove
@@ -69,7 +69,7 @@ def upload_package(auth_data, filename, verify):
     data['ex_id'] = EXERCISE_ID
     data['type'] = 'upload'
 
-    r = requests.post(UPLOAD_URL, data=data, headers=headers, cookies=r.cookies, files=files)
+    r = requests.post(UPLOAD_URL, data=data, headers=headers, cookies=r.cookies, files=files, verify=verify)
 
     # print r.headers
     print r.text
@@ -89,7 +89,7 @@ def download_and_execute_test(auth_data, verify):
     data['type'] = 'download'  # download tests
     
     # post request to server
-    r = requests.post(UPLOAD_URL, data=data, headers=headers, cookies=r.cookies)
+    r = requests.post(UPLOAD_URL, data=data, headers=headers, cookies=r.cookies, verify=verify)
     # get either compiled python or other info (e.g. auth errors)
     if r.headers['content-type'] == 'application/x-bytecode.python':
         # open a python subprocess with dedicated stdin/out/err

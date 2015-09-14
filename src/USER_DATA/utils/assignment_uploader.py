@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: Salvatore Zaza
-# @Date:   2015-09-11 15:26:57
+# @Date:   2015-09-11 16:23:48
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-09-11 16:23:48
+# @Last Modified time: 2015-09-14 17:27:20
+
+
 
 # BASE_URL = 'https://localhost:8000'
 
@@ -15,6 +17,16 @@ from os.path import join, basename
 import tarfile
 import requests
 import getpass
+
+
+def get_ssl_cert():
+    r = requests.get(SSL_CERT_URL, verify=False)
+    if r.status_code == 200:
+        with open("cert.pem", 'wb') as f:
+            f.write(r.content)
+        return "cert.pem"
+    else:
+        return False
 
 
 def get_user_and_pass():
@@ -73,10 +85,12 @@ if __name__ == '__main__':
 
     # upload
     if not args.package:
+        verify = get_ssl_cert()
+
         UPLOAD_URL = BASE_URL + "/upload-assignment/"
 
         s = requests.session()
-        r = s.get(BASE_URL, verify=False)
+        r = s.get(BASE_URL, verify=verify)
     
         files = {'file': open(package_filepath, 'rb')}
     
@@ -85,7 +99,7 @@ if __name__ == '__main__':
         csrftoken = r.cookies['csrftoken']
         headers = {'X-CSRFToken': csrftoken, 'Referer': UPLOAD_URL}
     
-        r = requests.post(UPLOAD_URL, data=auth_data, headers=headers, cookies=r.cookies, files=files)
+        r = requests.post(UPLOAD_URL, data=auth_data, headers=headers, cookies=r.cookies, files=files, verify=verify)
     
         # print r.headers
         print r.text

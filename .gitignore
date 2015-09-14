@@ -61,8 +61,8 @@ Desktop.ini
 **/USER_DATA/courses/*
 
 # Deploy statics
-#**/DEPLOY_STATIC/*
-#**/DEPLOY_STATIC/**/*
+**/DEPLOY_STATIC/*
+**/DEPLOY_STATIC/**/*
 
 # Media
 src/media/*
