@@ -36,6 +36,7 @@ class DownloadUtilsFileView(LoginRequiredMixin, StaffuserRequiredMixin, View):
         original_file = join(settings.USER_DATA_ROOT, 'utils/assignment_uploader.py')
         print original_file
         with open(original_file, 'rb') as original: data = original.read()
+        data = "SSL_CERT_URL = \"%s\" \n" % str(settings.SSL_CERT_URL) + data
         data = "BASE_URL = \"%s\" \n" % str(settings.SITE_URL) + data
         return data
 
