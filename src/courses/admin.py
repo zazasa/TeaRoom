@@ -18,7 +18,7 @@ class CourseAdmin(admin.ModelAdmin):
     '''
 
     list_display = ('course_full_name', 'Start_date', 'End_date',
-                    'Enrollment_due_date')
+                    'Enrollment_due_date', 'id')
     readonly_fields = ('Folder_path',)
     list_filter = []
 
