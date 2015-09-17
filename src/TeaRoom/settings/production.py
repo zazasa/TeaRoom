@@ -4,7 +4,7 @@ from .base import *
 ADMINS = (
     ("Elena", "elena.graverini@cern.ch"),
 #    ("Barbara", "barbara.storaci@cern.ch"),
-#    ("Marco", "mtresch@physik.uzh.ch"),
+    ("Marco", "mtresch@physik.uzh.ch"),
 )
 
 # Send a notification to the managers every time
@@ -13,9 +13,8 @@ ADMINS = (
 SEND_BROKEN_LINK_EMAILS = True
 MANAGERS = ADMINS
 ALLOWED_HOSTS = [
-    'marder.physik.uzh.ch',
-    'marder',
     'da.physik.uzh.ch',
-    'da'
+    'da',
+    'marder.physik.uzh.ch',
 ]
 ##STATIC_ROOT = join(BASE_DIR, 'static')
