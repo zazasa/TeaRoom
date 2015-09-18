@@ -63,10 +63,10 @@ def upload_package(auth_data, filename, verify):
     csrftoken = r.cookies['csrftoken']
     headers = {'X-CSRFToken': csrftoken, 'Referer': UPLOAD_URL}
 
-    files = {'file': open(filename, 'rb')}
+    files = {'file': open(filename, 'rb').read()}
 
     data = auth_data
-    data['ex_id'] = EXERCISE_ID
+    data['ex_id'] = str(EXERCISE_ID)
     data['type'] = 'upload'
 
     r = requests.post(UPLOAD_URL, data=data, headers=headers, cookies=r.cookies, files=files, verify=verify)
@@ -85,7 +85,7 @@ def download_and_execute_test(auth_data, verify):
     headers = {'X-CSRFToken': csrftoken, 'Referer': UPLOAD_URL}
 
     data = auth_data
-    data['ex_id'] = EXERCISE_ID
+    data['ex_id'] = str(EXERCISE_ID)
     data['type'] = 'download'  # download tests
     
     # post request to server
