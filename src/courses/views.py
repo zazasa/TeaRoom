@@ -289,9 +289,9 @@ class AssignmentListView(LoginRequiredMixin, ListView):
     def _get_result_list(self, ex_list):
         result_list = []
         for e in ex_list:
-            res_set = e.result_set.filter(Pass=True).order_by('-Creation_date')
+            res_set = e.result_set.filter(Pass=True, User=self.request.user).order_by('-Creation_date')
             if not res_set:
-                res_set = e.result_set.filter(Pass=False).order_by('-Creation_date')
+                res_set = e.result_set.filter(Pass=False, User=self.request.user).order_by('-Creation_date')
             if res_set:
                 result_list.append(res_set[0])
         return result_list
