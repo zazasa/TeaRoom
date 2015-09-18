@@ -276,8 +276,10 @@ class UploadResultView(TemplateView):
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
 
-    def check_submit_delay(self, e):
-        res_set = e.result_set.all().order_by('-Creation_date')
+    #def check_submit_delay(self, e):
+    def check_submit_delay(self, e, user):
+        #res_set = e.result_set.all().order_by('-Creation_date')
+        res_set = e.result_set.filter(User=user).order_by('-Creation_date')
         if res_set:
             r = res_set[0]
             deltamin = (datetime.utcnow().replace(tzinfo=r.Creation_date.tzinfo) - r.Creation_date).seconds / 60
@@ -306,7 +308,8 @@ class UploadResultView(TemplateView):
             try:
                 e = user.exercise_set.get(id=ex_id)
 
-                if not self.check_submit_delay(e):
+                #if not self.check_submit_delay(e):
+                if not self.check_submit_delay(e, user):
                     messages.info(self.request, self.messages['timedelta'])
                 elif not self.check_hard_date(e):
                     messages.info(self.request, self.messages['hard_date'] % e.Assignment.Hard_date)
