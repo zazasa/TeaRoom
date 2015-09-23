@@ -189,11 +189,11 @@
 </div>
 {# side panel#}
 <div id='slider-panel' class='hidden'>
-    <div class="panel panel-primary">
+    <div class="panel panel-primary" style="height:80%">
           <div class="panel-heading">
                 <h3 class="panel-title">Select students</h3>
           </div>          
-          <div class="panel-body">
+          <div class="panel-body" style="height:87%; overflow:auto">
                 {% if selected_course.Students.all %}
                     <ul id='students-selector' class="list-group checked-list-box" exercise-id="None">                
                     {% for student in selected_course.Students.all  %}
