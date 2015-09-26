@@ -3,7 +3,7 @@
 # @Author: salvo
 # @Date:   2015-05-22 14:03:30
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-09-14 17:28:15
+# @Last Modified time: 2015-09-26 18:51:13
 
 from os.path import join, dirname
 from os import remove
@@ -11,7 +11,6 @@ import tarfile
 import requests
 import getpass
 import sys
-
 from subprocess import Popen, PIPE, STDOUT
 
 # SSL_CERT_URL="http://localhost:8000/static/CAServerRoot.pem"
@@ -55,7 +54,7 @@ def create_package(file_list, out):
             tar.add(filename)
 
 
-def upload_package(auth_data, filename, verify):
+def upload_package(auth_data, filename, verify, different_user):
     s = requests.session()
 
     # get csrftoken from server
@@ -68,6 +67,8 @@ def upload_package(auth_data, filename, verify):
     data = auth_data
     data['ex_id'] = str(EXERCISE_ID)
     data['type'] = 'upload'
+    if different_user:
+        data['different_user'] = different_user
 
     r = requests.post(UPLOAD_URL, data=data, headers=headers, cookies=r.cookies, files=files, verify=verify)
 
@@ -114,6 +115,11 @@ def download_and_execute_test(auth_data, verify):
 if __name__ == '__main__':
     auth_data = get_user_and_pass()
 
+    if '--admin' in sys.argv:
+        different_user = raw_input("Please provide a student account email: ")
+    else:
+        different_user = False
+
     verify = get_ssl_cert()
     
     out = download_and_execute_test(auth_data, verify)
@@ -121,7 +127,6 @@ if __name__ == '__main__':
     # pack and upload test output
     if out:
         create_package(FILES_TO_COMPLETE, out)
-        upload_package(auth_data, OUTPUT_FILENAME, verify)
+        upload_package(auth_data, OUTPUT_FILENAME, verify, different_user)
         # remove test output from user's disk
         remove(OUTPUT_FILENAME)
-

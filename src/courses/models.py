@@ -3,7 +3,7 @@
 # @Author: Salvatore Zaza
 # @Date:   2015-08-02 18:38:54
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-09-11 12:02:21
+# @Last Modified time: 2015-09-26 18:03:23
 
 from django.db import models
 # Create your models here.
@@ -267,6 +267,7 @@ class Result(models.Model):
     Creation_date = models.DateTimeField(editable=False, auto_now_add=True)
     Pass = models.BooleanField(default=False)
     Parser_output = models.TextField(editable=False, default='')
+    Submit_by = models.TextField(default='N/A')
     
     objects = ResultQuerySet.as_manager()  # Custom queryset method
 

@@ -24,7 +24,9 @@ from subprocess import Popen, PIPE, STDOUT
 from braces.views import LoginRequiredMixin, CsrfExemptMixin, StaffuserRequiredMixin
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 # Create your views here.
 class UtilsView(LoginRequiredMixin, StaffuserRequiredMixin, TemplateView):
@@ -253,7 +255,7 @@ class UploadResultView(TemplateView):
         username = self.request.POST.get('username')
         password = self.request.POST.get('password')
         user = authenticate(username=username, password=password)
-        if user is not None and user.is_active and not user.is_staff:
+        if user is not None and user.is_active:
             return user
         else:
             return False
@@ -276,9 +278,9 @@ class UploadResultView(TemplateView):
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
 
-    #def check_submit_delay(self, e):
+    # def check_submit_delay(self, e):
     def check_submit_delay(self, e, user):
-        #res_set = e.result_set.all().order_by('-Creation_date')
+        # res_set = e.result_set.all().order_by('-Creation_date')
         res_set = e.result_set.filter(User=user).order_by('-Creation_date')
         if res_set:
             r = res_set[0]
@@ -299,30 +301,52 @@ class UploadResultView(TemplateView):
             return False
         return True
 
+    def parse_and_submit(self, e, user, different_user):
+        f = self.request.FILES['file']
+        res_folder = self.create_result_folder(user, e)
+        copy_and_unzip(f, join(res_folder, 'user_files'))
+
+        passed, out = self.execute_parser(e, res_folder)
+        r = Result(Exercise=e, User=different_user or user, Pass=passed, Parser_output=out, Submit_by=user)
+        r.save()
+        return out
+
     def post(self, request):
         user = self.authenticate()
         if user:
             ex_id = self.request.POST.get('ex_id')
             req_type = self.request.POST.get('type')
             submit_key = self.request.POST.get('submit_key')
+            different_user = self.request.POST.get('different_user') or False
             try:
-                e = user.exercise_set.get(id=ex_id)
+                if user.is_staff:
+                    e = Exercise.objects.get(id=ex_id)
+                else:
+                    e = user.exercise_set.get(id=ex_id)
+                print e
 
-                #if not self.check_submit_delay(e):
-                if not self.check_submit_delay(e, user):
+                if different_user:
+                    if not user.is_staff: raise Exception('Not a staff user')
+                    different_user = User.objects.get(email=different_user)
+                    self.check_submit_key(e, submit_key)
+
+                    out = self.parse_and_submit(e, user, different_user)
+
+                    messages.info(self.request, self.messages['success'])
+                    messages.info(self.request, self.messages['result'] % out)
+
+                elif not self.check_submit_delay(e, user):
                     messages.info(self.request, self.messages['timedelta'])
                 elif not self.check_hard_date(e):
                     messages.info(self.request, self.messages['hard_date'] % e.Assignment.Hard_date)
                 else:
-                    self.check_submit_key(e, submit_key)
                     if req_type == 'download':
                         return self.download_test_file(e)
-                    f = self.request.FILES['file']
-                    res_folder = self.create_result_folder(user, e)
-                    copy_and_unzip(f, join(res_folder, 'user_files'))
-                    passed, out = self.execute_parser(e, res_folder)
-                    r = Result(Exercise=e, User=user, Pass=passed, Parser_output=out)
-                    r.save()
+                    if user.is_staff: raise Exception('This is a staff user')
+                    self.check_submit_key(e, submit_key)
+
+                    out = self.parse_and_submit(e, user, different_user)
+
                     messages.info(self.request, self.messages['success'])
                     messages.info(self.request, self.messages['result'] % out)
                     if not self.check_due_date(e):

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: salvo
 # @Date:   2015-05-11 16:35:37
-# @Last Modified by:   salvo
-# @Last Modified time: 2015-08-02 18:07:10
+# @Last Modified by:   Salvatore Zaza
+# @Last Modified time: 2015-09-26 19:05:53
 
 from django.contrib import admin
 from django.conf import settings
@@ -120,7 +120,7 @@ class ResultAdmin(admin.ModelAdmin):
     '''
         Admin View for Result
     '''
-    list_display = ('User', 'Exercise', 'Creation_date', 'Pass')
+    list_display = ('User', 'Exercise', 'Creation_date', 'Pass', 'Submit_by')
     readonly_fields = ('User', 'Exercise', 'Pass', 'Creation_date', 'Parser_output')
         
 
