@@ -120,6 +120,8 @@ if __name__ == '__main__':
 
     # pack and upload test output
     if out:
+        print '\n\n\t Now please WAIT until your result is uploaded to the server...'
+        print '\t Do NOT exit the program until you read \"info - Exercise result\".'
         create_package(FILES_TO_COMPLETE, out)
         upload_package(auth_data, OUTPUT_FILENAME, verify)
         # remove test output from user's disk
