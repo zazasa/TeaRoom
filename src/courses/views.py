@@ -156,9 +156,9 @@ class AssignmentListStaffView(LoginRequiredMixin, StaffuserRequiredMixin, ListVi
                 result_queryset = student.result_set.filter(Exercise=exercise)
                 result = result_queryset.last_result()
                 if result:
-                    student_list.append({"result_id": result.id, "student_id": str(student.id), "student": str(student.name), "result": str(result.Pass), "date": str(result.Creation_date.strftime('%B %d, %H:%M'))})
+                    student_list.append({"result_id": result.id, "student_id": str(student.id), "student": student.name, "result": str(result.Pass), "date": str(result.Creation_date.strftime('%B %d, %H:%M'))})
                 else:
-                    student_list.append({"result_id": 'false', "student_id": str(student.id), "student": str(student.name), "result": 'N/A', "date": 'N/A'})
+                    student_list.append({"result_id": 'false', "student_id": str(student.id), "student": student.name, "result": 'N/A', "date": 'N/A'})
             exercise_list.append({"exercise_id": str(exercise.id), "student_list": student_list})
         return exercise_list
 

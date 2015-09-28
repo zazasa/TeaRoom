@@ -3,7 +3,7 @@
 # @Author: Salvatore Zaza
 # @Date:   2015-08-02 18:38:54
 # @Last Modified by:   Salvatore Zaza
-# @Last Modified time: 2015-09-26 18:03:23
+# @Last Modified time: 2015-09-28 20:06:48
 
 from django.db import models
 # Create your models here.
@@ -18,6 +18,7 @@ from django.conf import settings
 import random, string
 
 from django.utils import timezone
+from django.utils.encoding import smart_unicode
 
 
 class CourseManager(models.Manager):
@@ -278,6 +279,8 @@ class Result(models.Model):
     def __str__(self):
         return '%s - %s' % (self.Exercise, self.User)
 
+    def __unicode__(self):
+        return smart_unicode('%s - %s' % (self.Exercise, self.User))
 
 class UserFile(models.Model):
     
