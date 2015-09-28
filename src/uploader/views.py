@@ -321,6 +321,8 @@ class UploadResultView(TemplateView):
             try:
                 if user.is_staff:
                     e = Exercise.objects.get(id=ex_id)
+                    if req_type == 'download':
+                        return self.download_test_file(e)
                 else:
                     e = user.exercise_set.get(id=ex_id)
                 print e
