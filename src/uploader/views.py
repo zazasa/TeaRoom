@@ -378,7 +378,10 @@ class UploadResultView(TemplateView):
 
     def create_result_folder(self, user, exercise):
         res_dest_folder = join(settings.USER_DATA_ROOT, str(exercise.Folder_path), 'RESULTS')
-        user_dest_folder = join(res_dest_folder, str(user.name))
+        try:
+            user_dest_folder = join(res_dest_folder, str(user.name))
+        except UnicodeEncodeError:
+            user_dest_folder = join(res_dest_folder, str((user.name).encode('ascii', 'ignore')))
         timed_folder = join(user_dest_folder, 'result_' + str(datetime.now().isoformat().split('.')[0].replace(':', '_')))
         
         test_files = join(settings.USER_DATA_ROOT, str(exercise.Folder_path), 'test_files')
