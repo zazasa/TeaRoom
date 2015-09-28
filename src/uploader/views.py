@@ -303,7 +303,7 @@ class UploadResultView(TemplateView):
 
     def parse_and_submit(self, e, user, different_user):
         f = self.request.FILES['file']
-        res_folder = self.create_result_folder(user, e)
+        res_folder = self.create_result_folder(different_user or user, e)
         copy_and_unzip(f, join(res_folder, 'user_files'))
 
         passed, out = self.execute_parser(e, res_folder)
