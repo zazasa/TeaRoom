@@ -138,10 +138,7 @@
                                                             {% if student.result_set|with_exercise:exercise %}
                                                             {% with student.result_set|with_exercise:exercise as result  %}
                                                             <td>{{result.last_result.Pass}}</td>
-                                                            <td>{% localtime off %}
-                                                                {{result.last_result.Creation_date|date:"F j, H:i"}}
-                                                                {% endlocaltime %}
-                                                            </td>
+                                                            <td>{{result.last_result.Creation_date|date:"F j, H:i"}}</td>
                                                             {% endwith %}
                                                             
                                                             {% else %}
