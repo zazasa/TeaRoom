@@ -5,6 +5,7 @@ ADMINS = (
     ("Elena", "elena.graverini@cern.ch"),
 #    ("Barbara", "barbara.storaci@cern.ch"),
     ("Marco", "mtresch@physik.uzh.ch"),
+    ("Andreas", "weiden@physik.uzh.ch"),
 )
 
 # Send a notification to the managers every time
