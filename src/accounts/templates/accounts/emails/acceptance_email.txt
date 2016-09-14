@@ -1,5 +1,5 @@
 {% load i18n %}{% autoescape off %}
-{% blocktrans %}Your registration of {{ site_name }} was accepted by out staff.{% endblocktrans %}
+{% blocktrans %}Your registration of {{ site_name }} was accepted by our staff.{% endblocktrans %}
 
 {% trans 'Please click the following url and set your account password to finish activation.' %}
 {% block reset_link %}
