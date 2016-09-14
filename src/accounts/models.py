@@ -49,7 +49,7 @@ class User(AbstractNamedUser):
             # 'site_name': site_name,
             # 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
             # 'token': token_generator.make_token(user),
-            # 'protocol': 'https' if use_https else 'http',
+            'protocol': 'https',  # if use_https else 'http',
         }
 
         return context
