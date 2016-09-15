@@ -15,3 +15,4 @@ application = get_wsgi_application()
 
 # Set OS environmental variable HTTPS to on
 os.environ['HTTPS'] = "on"
+os.environ['wsgi.url_scheme'] = 'https'
