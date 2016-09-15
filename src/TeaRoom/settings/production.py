@@ -3,7 +3,7 @@ from .base import *
 # Destination of error alerts
 ADMINS = (
     ("Elena", "elena.graverini@cern.ch"),
-#    ("Barbara", "barbara.storaci@cern.ch"),
+    #    ("Barbara", "barbara.storaci@cern.ch"),
     ("Marco", "mtresch@physik.uzh.ch"),
     ("Andreas", "weiden@physik.uzh.ch"),
 )
@@ -18,4 +18,6 @@ ALLOWED_HOSTS = [
     'da',
     'marder.physik.uzh.ch',
 ]
-##STATIC_ROOT = join(BASE_DIR, 'static')
+# STATIC_ROOT = join(BASE_DIR, 'static')
+
+SESSION_COOKIE_SECURE = True

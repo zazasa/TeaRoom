@@ -12,3 +12,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "TeaRoom.settings.production")
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
+
+# Set OS environmental variable HTTPS to on
+os.environ['HTTPS'] = "on"
