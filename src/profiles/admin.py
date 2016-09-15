@@ -54,9 +54,12 @@ class NewUserAdmin(NamedUserAdmin):
 
         # import pdb; pdb.set_trace()
 
+        context = {
+            'protocol': 'https',
+        }
         form = FirstPasswordSetForm({'email': user.email})
         form.is_valid()
-        return form.save(request=request, subject_template_name=subject_template_name, email_template_name=email_template_name)
+        return form.save(request=request, subject_template_name=subject_template_name, email_template_name=email_template_name, context)
 
 
 admin.site.register(User, NewUserAdmin)
