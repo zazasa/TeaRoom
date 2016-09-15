@@ -20,4 +20,11 @@ ALLOWED_HOSTS = [
 ]
 # STATIC_ROOT = join(BASE_DIR, 'static')
 
+# Try to use only HTTPS
+# (see: https://docs.djangoproject.com/en/1.10/topics/security/#security-recommendation-ssl
+# and:
+# http://stackoverflow.com/questions/8015685/how-to-enable-https-in-django-auth-generated-pages
+# )
+SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
