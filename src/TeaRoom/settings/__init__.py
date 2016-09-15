@@ -2,6 +2,7 @@
 # $ export DJANGO_SETTINGS_MODULE=cherry_cakes.settings.production
 
 try:
-    from .development import *
+#    from .development import *
+    from .production import *
 except ImportError:
     pass
