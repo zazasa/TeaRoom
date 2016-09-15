@@ -45,7 +45,8 @@ class NewUserAdmin(NamedUserAdmin):
             message_bit = "1 user was"
         else:
             message_bit = "%s users were" % rows_updated
-        self.message_user(request, "%s successfully marked as accepted." % message_bit)
+        self.message_user(
+            request, "%s successfully marked as accepted." % message_bit)
 
     def set_first_password(self, user, request):
         subject_template_name = 'accounts/emails/acceptance_email_subject.txt'
@@ -54,12 +55,9 @@ class NewUserAdmin(NamedUserAdmin):
 
         # import pdb; pdb.set_trace()
 
-        context = {
-            'protocol': 'https',
-        }
         form = FirstPasswordSetForm({'email': user.email})
         form.is_valid()
-        return form.save(request=request, subject_template_name=subject_template_name, email_template_name=email_template_name)
+        return form.save(request=request, subject_template_name=subject_template_name, email_template_name=email_template_name, use_https=True)
 
 
 admin.site.register(User, NewUserAdmin)
