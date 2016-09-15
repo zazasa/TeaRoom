@@ -59,7 +59,7 @@ class NewUserAdmin(NamedUserAdmin):
         }
         form = FirstPasswordSetForm({'email': user.email})
         form.is_valid()
-        return form.save(request=request, subject_template_name=subject_template_name, email_template_name=email_template_name, context)
+        return form.save(request=request, subject_template_name=subject_template_name, email_template_name=email_template_name)
 
 
 admin.site.register(User, NewUserAdmin)
