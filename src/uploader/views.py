@@ -285,7 +285,7 @@ class UploadResultView(TemplateView):
         if res_set:
             r = res_set[0]
             deltamin = (datetime.utcnow().replace(tzinfo=r.Creation_date.tzinfo) - r.Creation_date).seconds / 60
-            if deltamin < 10:
+            if deltamin < 2:
                 return False
         return True
 
