@@ -17,6 +17,10 @@ from os.path import join, basename
 import tarfile
 import requests
 import getpass
+try:
+    import keyring
+except ImportError:
+    keyring = False
 
 
 def get_ssl_cert():
@@ -28,13 +32,16 @@ def get_ssl_cert():
     else:
         return False
 
-
+    
 def get_user_and_pass():
-    auth_data = {
-        'username': raw_input("Please provide a STAFF account email: "),
-        'password': getpass.getpass('Password: '),
-    }
-    return auth_data
+    username = raw_input("Please provide a STAFF account email: ")
+    password = None
+    if keyring:
+        password = keyring.get_password("DataAnalysis", username)
+    if password is None:
+        password = getpass.getpass('Password: ')
+    return {'username': username,
+            'password': password}
 
 
 def make_tarfile(output_filename, source_dir):
