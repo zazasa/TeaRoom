@@ -10,6 +10,10 @@ from os import remove
 import tarfile
 import requests
 import getpass
+try:
+    import keyring
+except ImportError:
+    keyring = False
 import sys
 from subprocess import Popen, PIPE, STDOUT
 
@@ -37,12 +41,15 @@ def get_ssl_cert():
 
 
 def get_user_and_pass():
-    auth_data = {
-        'username': raw_input("Enter email: "),
-        'password': getpass.getpass('Password: '),
-        'submit_key': SUBMIT_KEY
-    }
-    return auth_data
+    username = raw_input("Enter email: ")
+    password = None
+    if keyring:
+        password = keyring.get_password("DataAnalysis", username)
+    if password is None:
+        password = getpass.getpass('Password: ')
+    return {'username': username,
+            'password': password,
+            'submit_key': SUBMIT_KEY}
 
 
 def create_package(file_list, out):
