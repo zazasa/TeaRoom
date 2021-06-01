@@ -65,7 +65,7 @@ six==1.9.0
 stevedore==1.4.0
 system-service==0.1.6
 uTidylib==0.2
-urllib3==1.7.1
+urllib3==1.26.5
 virtualenv==12.1.1
 virtualenv-clone==0.2.5
 virtualenvwrapper==4.5.1
